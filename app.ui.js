@@ -280,7 +280,8 @@
             });
           }
         }else{
-          C.state.tasks.push({ id:(Math.random()+Date.now()).toString(36), title:v.title, subject:v.subject, type:v.type, estimate:v.estimate, plannedDate:v.plannedDate, dueDate:v.dueDate, notes:v.notes, done:false });
+          // FIX: gebruik core helper voor consistente ID's en valide syntax
+          C.addTask({ title:v.title, subject:v.subject, type:v.type, estimate:v.estimate, plannedDate:v.plannedDate, dueDate:v.dueDate, notes:v.notes, done:false });
           if(v.repeat && v.repeatPattern){
             const reps=C.planRepetitions(v.plannedDate, v.repeatPattern, v.repeatMinutes, v.subject, v.title, v.dueDate, v.notes);
             reps.forEach(r=>C.state.tasks.push(r));
