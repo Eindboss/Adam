@@ -1,0 +1,145 @@
+[
+  {
+    "id": "f4fdf53a-1660-41f3-89bd-4388a38b8925",
+    "title": "NED: woordenschat (1/4)",
+    "subject": "Nederlands",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-28",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "1a4f42e2-25f2-4dfa-af7c-a1c08044b69e",
+    "title": "NED: grammatica (1/3)",
+    "subject": "Nederlands",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-28",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "e8bd6ac9-d4af-4e75-b646-b1d877db3644",
+    "title": "NED: leesvaardigheid (1/3)",
+    "subject": "Nederlands",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-28",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "831ea8a9-4e53-4114-b58a-0873279adf88",
+    "title": "NED: woordenschat (2/4)",
+    "subject": "Nederlands",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-29",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "93cdd740-20d7-47b1-80cd-e1b77b447405",
+    "title": "NED: grammatica (2/3)",
+    "subject": "Nederlands",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-29",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "b3dc38cf-9069-4d15-90d5-05fa2399ce5b",
+    "title": "NED: leesvaardigheid (2/3)",
+    "subject": "Nederlands",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-29",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "3f847dc5-b69d-4db4-98b9-c1213c78c9d3",
+    "title": "NED: woordenschat (3/4)",
+    "subject": "Nederlands",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-30",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "a5ea101e-4306-491c-b35a-f84a2eae638b",
+    "title": "NED: grammatica (3/3)",
+    "subject": "Nederlands",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-30",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "45c01989-7586-49f1-a090-2f81c5c1e117",
+    "title": "NED: leesvaardigheid (3/3)",
+    "subject": "Nederlands",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-30",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "774760e6-d767-475f-9cd1-421f47bca03f",
+    "title": "NED: woordenschat (4/4)",
+    "subject": "Nederlands",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-30",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "cf11406b-dc0d-45fe-b04c-8fb16973f922",
+    "title": "WIS: hoofdstuk 3 (1/3)",
+    "subject": "Wiskunde",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-28",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "716975d9-69b7-4ff4-ba59-09f83f0c9596",
+    "title": "WIS: hoofdstuk 3 (2/3)",
+    "subject": "Wiskunde",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-29",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "d85b759f-7042-449a-bb3c-1a1030a04cc0",
+    "title": "WIS: hoofdstuk 3 (3/3)",
+    "subject": "Wiskunde",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-30",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  }
+]
