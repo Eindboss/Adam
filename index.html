@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Adam’s Leeragenda</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="./styles.css" rel="stylesheet">
+  
+  
+  
+  
+  
+  
+  
+  
+
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./icon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="./icon-64.png">
+  <link rel="icon" type="image/png" sizes="128x128" href="./icon-128.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
+  <link rel="manifest" href="./site.webmanifest">
+
+</head>
+<body data-theme="dark">
+  <div class="app" id="app" aria-live="polite">
+    <header class="header" role="banner">
+      <div class="title-row">
+        <img id="brandLogo" src="./icon-64.png" alt="" width="28" height="28" style="border-radius:8px; margin-right:8px;" />
+        <h1>Adam’s Leeragenda</h1>
+        <button id="themeToggle" class="btn" title="Wissel tussen donker/licht thema" aria-label="Wissel thema">🌗 Donker thema</button>
+      </div>
+
+      <div class="chips" aria-hidden="true">
+        <span class="chip">Krimpenerwaard College</span>
+        <span class="chip">Krimpen aan den IJssel</span>
+        <span class="chip">Gymnasium · klas 1</span>
+      </div>
+
+      <div class="week-actions" role="toolbar" aria-label="Week acties">
+        <button class="btn" id="prevWeekBtn">Vorige week</button>
+        <button class="btn" id="thisWeekBtn">Deze week</button>
+        <button class="btn" id="nextWeekBtn">Volgende week</button>
+        <button class="btn primary" id="newTaskBtn">Nieuwe taak</button>
+        <button class="btn" id="theme-toggle" title="Thema wisselen" aria-label="Thema wisselen">Thema</button>
+      </div>
+
+      <div class="filters" role="region" aria-label="Zoek en filter">
+        <div class="row">
+          <input id="searchInput" class="input" type="search" placeholder="Zoeken…" aria-label="Zoeken in titel">
+          <select id="subjectFilter" class="select" aria-label="Filter op vak">
+            <option value="Alle">Alle vakken</option>
+          </select>
+        </div>
+        <label class="check"><input id="showDoneToggle" type="checkbox"> Toon afgeronde taken</label>
+        <span class="link-like" id="clearDoneBtn" role="button" tabindex="0" aria-label="Wis afgeronde taken van deze week">Wis afgerond (deze week)</span>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Dagen">
+        <div class="chev" id="chevLeft" aria-label="Vorige dag" role="button">‹</div>
+        <div class="tablist" id="tablist"></div>
+        <div class="chev" id="chevRight" aria-label="Volgende dag" role="button">›</div>
+      </div>
+
+      <div class="view-toggle">
+        <button class="btn" id="toggleViewBtn" aria-pressed="false">Weekoverzicht</button>
+        <button class="btn" id="quickAddBtn">+ Taak toevoegen</button>
+      </div>
+    </header>
+
+    <main id="main" role="main" tabindex="-1">
+      <section id="dayView" aria-label="Dagweergave">
+        <div class="dayhead">
+          <h2 class="daytitle" id="dayTitle">Maandag 01 jan</h2>
+          <div class="daymeta" id="dayTotal">Totaal: 0 min</div>
+        </div>
+        <div id="taskList"></div>
+      </section>
+
+      <section id="weekView" aria-label="Weekoverzicht" style="display:none">
+        <div class="week-grid" id="weekGrid" aria-describedby="weekHelp"></div>
+        <p id="weekHelp" class="form-help" style="margin-top:10px">Tip: sleep taken naar een andere dag. In de dagweergave gebruik je “🗓” op de kaart om snel naar morgen te verplaatsen.</p>
+      </section>
+
+      <section class="stats" aria-label="Stats per vak (deze week)">
+        <h3 class="sr-only">Stats per vak</h3>
+        <div id="statsList"></div>
+      </section>
+    
+      <!-- Student (iPhone) view -->
+      <section id="studentView" class="student-view" aria-label="Leerlingweergave" hidden>
+        <header class="student-header">
+          <h2 id="studentDayTitle">Vandaag</h2>
+          <button class="btn" id="studentAddBtn" aria-label="Snelle taak toevoegen">+ Taak</button>
+        </header>
+        <div id="studentTaskList" class="student-list" role="list"></div>
+        <div id="studentEmpty" class="student-empty form-help" hidden>Geen taken voor vandaag.</div>
+      </section>
+
+</main>
+  </div>
+
+  <!-- MODALS -->
+  <div class="modal" id="taskModal" aria-modal="true" role="dialog" aria-labelledby="taskModalTitle">
+    <div class="sheet">
+      <h3 id="taskModalTitle">Nieuwe taak</h3>
+      <form id="taskForm" autocomplete="off">
+        <div class="grid">
+          <label><span>Titel</span><input class="input" type="text" id="f_title" required placeholder="Bijv. Paragraaf 2 leren"></label>
+          <div class="row-2">
+            <label><span>Vak</span><select class="select" id="f_subject" required></select></label>
+            <label><span>Soort</span>
+              <select class="select" id="f_type" required>
+                <option>Huiswerk</option><option>Leerwerk</option><option>Project</option><option>Overig</option><option>Herhaling</option>
+              </select>
+            </label>
+          </div>
+          <div class="row-2">
+            <label><span>Tijd (minuten)</span><input class="input" type="number" id="f_estimate" min="1" step="1" required value="25"></label>
+            <label><span>Plandag</span><input class="input" type="date" id="f_plannedDate" required></label>
+          </div>
+          <label><span>Deadline (toetsdatum)</span><input class="input" type="date" id="f_dueDate"></label>
+          <label><span>Notities</span><textarea class="input" id="f_notes" rows="3" placeholder="Tip: plan kleine blokken en voeg herhaling toe"></textarea></label>
+          <div class="card" aria-label="Verdelen tot deadline">
+            <label class="check"><input type="checkbox" id="f_split"> Verdeel dagelijks t/m de deadline</label>
+            <div class="row-2">
+              <label><span>Minuten per dag</span><input class="input" type="number" id="f_splitMinutes" min="5" step="5" value="25"></label>
+              <label class="check" style="align-items:center; margin-top:22px;"><input type="checkbox" id="f_skipWeekend" checked> Weekend overslaan</label>
+            </div>
+            <div class="form-help">Titels worden automatisch genummerd als (1/N).</div>
+          </div>
+          <div class="card" aria-label="Herhaling">
+            <label class="check"><input type="checkbox" id="f_repeat"> Herhaling toevoegen (1,3,7)</label>
+            <div class="row-2">
+              <label><span>Minuten/sessie</span><input class="input" type="number" id="f_repeatMinutes" min="5" step="5" value="10"></label>
+              <label><span>Patroon</span><input class="input" type="text" id="f_repeatPattern" value="1,3,7"></label>
+            </div>
+            <div class="form-help">Alleen positieve getallen, gescheiden door komma’s. Herhalingen vallen binnen het bereik t/m de deadline.</div>
+          </div>
+          <div id="formError" class="error" role="alert" style="display:none"></div>
+          <div class="form-actions">
+            <button type="button" class="btn" id="cancelFormBtn">Annuleren</button>
+            <button type="submit" class="btn primary" id="submitFormBtn">Toevoegen</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="quickModal" aria-modal="true" role="dialog" aria-labelledby="quickTitle">
+    <div class="sheet">
+      <h3 id="quickTitle">Snel toevoegen</h3>
+      <form id="quickForm">
+        <div class="grid">
+          <label><span>Titel</span><input class="input" id="q_title" required placeholder="Kort huiswerk"></label>
+          <div class="row-2">
+            <label><span>Vak</span><select class="select" id="q_subject" required></select></label>
+            <label><span>Tijd (minuten)</span><input class="input" id="q_minutes" type="number" min="1" step="1" value="15"></label>
+          </div>
+          <div class="row-2">
+            <label><span>Plandag</span><input class="input" id="q_date" type="date" required></label>
+            <label><span>Soort</span>
+              <select class="select" id="q_type">
+                <option>Huiswerk</option><option>Leerwerk</option><option>Overig</option>
+              </select>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" id="quickCancel">Annuleren</button>
+            <button type="submit" class="btn primary">Toevoegen</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<link rel="icon" href="data:;base64,=">
+
+<!-- Core eerst -->
+<script src="./theme.js" defer></script>
+<script src="./app.core.js" defer></script>
+
+<!-- UI namespace en helpers, daarna render/forms/events/init -->
+<script src="./app.ui.namespace.js" defer></script>
+<script src="./app.ui.helpers.js" defer></script>
+<script src="./app.ui.render.js" defer></script>
+<script src="./app.ui.forms.js" defer></script>
+<script src="./app.ui.events.js" defer></script>
+<script src="./app.ui.init.js" defer></script>
+
+<!-- Boot voor statusmeldingen (laadt niets meer dynamisch) -->
+<script src="./app.boot.js" defer></script>
+
+</body>
+</html>
