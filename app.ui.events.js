@@ -116,7 +116,7 @@
       }
 
       C.save(); UI.forms.closeForm(); UI.render.renderAll();
-    });
+    };
 
     // Focus trap
     ['taskModal','quickModal'].forEach(id=>{
