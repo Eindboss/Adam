@@ -6,7 +6,30 @@
   if(!C || !UI){ console.error('AppCore of AppUI ontbreekt'); return; }
   const R = UI.render;
 
+  
+  function applyUIMode(mode){
+    const doc = document.documentElement;
+    C.state.uiMode = mode === 'student' ? 'student' : 'desktop';
+    try{ C.save(); }catch(_){}
+    doc.dataset.uimode = C.state.uiMode;
+    const appEl = document.getElementById('app');
+    const stuEl = document.getElementById('studentView');
+    if(appEl) appEl.style.display = (C.state.uiMode==='desktop') ? '' : 'none';
+    if(stuEl) stuEl.hidden = !(C.state.uiMode==='student');
+    const btn = document.getElementById('modeToggle');
+    if(btn){
+      const to = (C.state.uiMode==='student') ? 'Beheer-modus' : 'Leerling-modus';
+      btn.textContent = to;
+      btn.setAttribute('aria-pressed', String(C.state.uiMode==='student'));
+      btn.title = 'Schakel leerling-/beheerweergave';
+    }
+    try{ UI.render.renderAll(); }catch(_){}
+  }
+
   function bindBasic(){
+    const modeBtn = document.getElementById('modeToggle');
+    if(modeBtn){ modeBtn.onclick = ()=> applyUIMode(C.state.uiMode==='student' ? 'desktop' : 'student'); }
+
     const el = UI.el;
     // Filters
     el.subjectFilter.onchange = ()=>{ C.state.filters.subject = el.subjectFilter.value; C.save(); R.renderAll(); };

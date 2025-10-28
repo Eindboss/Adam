@@ -343,3 +343,14 @@ h1,h2,h3{ letter-spacing: .2px; }
 /* Header brand logo */
 #brandLogo{ display:inline-block; vertical-align:middle; }
 .header .title-row h1{ display:inline-block; vertical-align:middle; margin-left:6px; }
+
+
+/* === UI Mode toggle (student/desktop) === */
+html[data-uimode="student"] #app { display:none !important; }
+html[data-uimode="student"] #studentView { display:block !important; }
+html[data-uimode="desktop"] #app { display:block !important; }
+html[data-uimode="desktop"] #studentView { display:none !important; }
+
+/* Header control spacing */
+.header .title-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+#modeToggle.btn { background: linear-gradient(135deg, var(--primary), var(--primary-2)); color:#fff; border:none; }
