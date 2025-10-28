@@ -1,56 +1,1325 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Adam’s Leeragenda</title>
-  <meta name="color-scheme" content="light only">
-  <!-- Tailwind for utility classes -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- React + ReactDOM UMD -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <!-- Firebase compat (Auth + Firestore) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-
-  <!-- ✅ Firebase config (gepatcht) -->
-  <script>
-    window.FIREBASE_CONFIG = {
-      apiKey: "AIzaSyDeyau613TAvys5iV8S11PmFhcSxECtaVY",
-      authDomain: "leeragenda.firebaseapp.com",
-      projectId: "leeragenda",
-      storageBucket: "leeragenda.appspot.com",
-      messagingSenderId: "996121641435",
-      appId: "1:996121641435:web:fb553773e99bf8bc6b67fe",
-      measurementId: "G-2SV73NZ5D3"
-    };
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --lightGreen:#A7F3D0; --darkYellow:#D97706; --cyanBlue:#06B6D4;
-      --ink:#0F172A; --slate:#334155;
+      /* Brand accents */
+      --accent-green:#A7F3D0;
+      --accent-yellow:#D97706;
+      --accent-cyan:#06B6D4;
+
+      /* Dark theme tokens */
+      --bg: #0b0f12;
+      --bg-2:#12171b;
+      --bg-3:#161c21;
+      --text:#eef2f6;
+      --muted:#9aa6b2;
+      --card:#0f1418;
+      --border:#202831;
+      --shadow: 0 6px 18px rgba(0,0,0,.35);
+
+      /* Light theme tokens (toggleable hook) */
+      --bg-l:#f7fafc;
+      --bg-2-l:#ffffff;
+      --bg-3-l:#f1f5f9;
+      --text-l:#0b1220;
+      --muted-l:#475569;
+      --card-l:#ffffff;
+      --border-l:#d9e1e8;
+      --shadow-l:0 6px 18px rgba(0,0,0,.08);
+
+      --radius:14px;
+      --radius-sm:10px;
+      --radius-xs:8px;
+
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+
+      --max-w: 390px; /* iPhone 14 logical width */
+      --transition: 140ms ease;
     }
-    body{ background: linear-gradient(135deg, #ffffff 0%, #E9FFF6 45%, #E8FAFF 100%); }
-    .glass{ background: rgba(255,255,255,.8); backdrop-filter: saturate(1.2) blur(8px);
-            -webkit-backdrop-filter: saturate(1.2) blur(8px); border:1px solid rgba(148,163,184,.25); }
-    .input{ border-radius:.9rem; border:1px solid #E2E8F0; padding:.65rem .9rem; outline:none; }
-    .input:focus{ border-color:#06B6D4; box-shadow:0 0 0 3px rgba(6,182,212,.25); }
-    .btn{ border-radius:.9rem; padding:.6rem 1rem; font-weight:700; transition: transform .05s ease, filter .2s ease; }
-    .btn:active{ transform: scale(.99); }
-    .btn-prim{ color:#fff; background-image: linear-gradient(180deg,#06B6D4,#0891B2); box-shadow:0 4px 16px rgba(6,182,212,.35); }
-    .btn-sec{ background:#F1F5F9; color:#334155; }
-    .chip{ border-radius:999px; padding:.25rem .625rem; font-size:.75rem; font-weight:600; display:inline-block; }
-    .col{ min-width:240px; max-width:320px; }
-    .task-card{ border-width:2px; transition: box-shadow .2s ease, transform .06s ease; }
-    .task-card:hover{ box-shadow:0 6px 22px rgba(2,132,199,.12); }
-    .task-card:active{ transform: scale(.99); }
-    .shadow-soft{ box-shadow:0 10px 30px rgba(2,132,199,.06), 0 2px 10px rgba(15,23,42,.06); }
+    /* Theme switch hook (default dark) */
+    [data-theme="dark"]{
+      --bg: var(--bg);
+      --bg-2: var(--bg-2);
+      --bg-3: var(--bg-3);
+      --text: var(--text);
+      --muted: var(--muted);
+      --card: var(--card);
+      --border: var(--border);
+      --shadow: var(--shadow);
+    }
+    [data-theme="light"]{
+      --bg: var(--bg-l);
+      --bg-2: var(--bg-2-l);
+      --bg-3: var(--bg-3-l);
+      --text: var(--text-l);
+      --muted: var(--muted-l);
+      --card: var(--card-l);
+      --border: var(--border-l);
+      --shadow: var(--shadow-l);
+    }
+
+    html,body{
+      height:100%;
+      background:var(--bg);
+      color:var(--text);
+      font-family: "Outfit", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    body{
+      margin:0;
+      padding:0;
+      display:flex;
+      justify-content:center;
+    }
+    .app{
+      width:100%;
+      max-width: var(--max-w);
+      min-height: 100dvh;
+      padding-left: max(12px, var(--safe-left));
+      padding-right: max(12px, var(--safe-right));
+      padding-bottom: calc(10px + var(--safe-bottom));
+      box-sizing:border-box;
+    }
+
+    /* Header */
+    .header{
+      position: sticky;
+      top:0;
+      z-index:50;
+      background: linear-gradient(180deg, var(--bg) 60%, rgba(0,0,0,0) 100%);
+      padding-top: calc(10px + var(--safe-top));
+      padding-bottom: 8px;
+      backdrop-filter: saturate(1.1) blur(6px);
+    }
+    .title-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      justify-content:space-between;
+      padding:4px 2px 8px 2px;
+    }
+    h1{
+      font-size: 22px;
+      line-height:1.2;
+      letter-spacing:.2px;
+      margin:0;
+      font-weight:800;
+    }
+    .chips{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+    .chip{
+      font-size:12px;
+      padding:6px 10px;
+      border:1px solid var(--border);
+      background:var(--bg-2);
+      color:var(--muted);
+      border-radius:999px;
+      user-select:none;
+    }
+
+    /* Sticky actions */
+    .week-actions{
+      display:flex;
+      gap:8px;
+      overflow:auto;
+      padding:6px 2px 8px 2px;
+    }
+    .btn{
+      border:1px solid var(--border);
+      background: var(--bg-2);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: var(--radius-xs);
+      font-weight:700;
+      font-size:14px;
+      cursor:pointer;
+      transition: transform var(--transition), background var(--transition), border var(--transition), opacity var(--transition);
+      box-shadow: none;
+      white-space:nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0px) scale(.98); }
+    .btn.primary{
+      background: var(--bg-3);
+    }
+
+    /* Search and filters */
+    .filters{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:8px;
+      padding: 6px 0 10px 0;
+      align-items:center;
+    }
+    .filters .row{
+      grid-column: 1 / -1;
+      display:flex;
+      gap:8px;
+    }
+    .input, .select{
+      width:100%;
+      border:1px solid var(--border);
+      background: var(--bg-2);
+      color: var(--text);
+      border-radius: var(--radius-xs);
+      padding:10px 11px;
+      font-size:14px;
+      outline:none;
+      transition: border var(--transition), background var(--transition);
+    }
+    .input::placeholder{ color: var(--muted); }
+    .check{
+      display:flex; align-items:center; gap:8px; font-size:14px; color:var(--muted);
+    }
+    .link-like{
+      font-size:13px; color:var(--muted);
+      text-decoration:underline; cursor:pointer;
+    }
+
+    /* Tabs */
+    .tabs{
+      display:flex; align-items:center; gap:8px; padding: 10px 0 6px 0;
+    }
+    .chev{
+      border:1px solid var(--border);
+      background:var(--bg-2);
+      width:38px; height:38px;
+      border-radius:12px;
+      display:grid; place-items:center;
+      cursor:pointer; user-select:none;
+      font-size:18px;
+      transition: transform var(--transition);
+    }
+    .chev:active{ transform: scale(.96); }
+    .tablist{
+      display:flex; gap:6px; overflow:auto; flex:1;
+    }
+    .tab{
+      min-width:48px;
+      padding:8px 12px;
+      border:1px solid var(--border);
+      background:var(--bg-2);
+      border-radius:999px;
+      font-weight:700;
+      color:var(--muted);
+      text-align:center;
+      cursor:pointer;
+      user-select:none;
+      transition: all var(--transition);
+    }
+    .tab[aria-selected="true"]{
+      color:var(--text);
+      background:var(--bg-3);
+      box-shadow: inset 0 0 0 2px var(--border);
+    }
+
+    /* Day header */
+    .dayhead{
+      display:flex; align-items:baseline; justify-content:space-between;
+      padding: 8px 2px 8px 2px;
+    }
+    .daytitle{
+      font-size:18px; font-weight:800; letter-spacing:.3px; margin:0;
+    }
+    .daymeta{ font-size:13px; color:var(--muted); }
+
+    /* Cards */
+    .card{
+      border:1px solid var(--border);
+      background:var(--card);
+      border-radius: var(--radius);
+      padding:12px;
+      margin-bottom:10px;
+      box-shadow: var(--shadow);
+      transition: transform var(--transition), border var(--transition), background var(--transition), box-shadow var(--transition);
+    }
+    .card:hover{ transform: translateY(-1px); }
+    .task-row{
+      display:grid; grid-template-columns: auto 1fr auto; gap:10px; align-items:center;
+    }
+    .task-left{
+      display:flex; align-items:center; gap:10px;
+    }
+    .pill{
+      font-size:12px; font-weight:700; padding:6px 10px; border-radius:999px;
+      border:1px solid var(--border); background:var(--bg-2); color:var(--text);
+      user-select:none;
+    }
+    .title{
+      font-weight:700; font-size:15px; line-height:1.25;
+    }
+    .meta{
+      font-size:12px; color:var(--muted); margin-top:4px;
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .actions{
+      display:flex; gap:8px;
+    }
+    .icon-btn{
+      width:36px; height:36px; display:grid; place-items:center;
+      border:1px solid var(--border); background:var(--bg-2);
+      border-radius:12px; cursor:pointer;
+      transition: transform var(--transition), background var(--transition);
+      font-size:16px;
+    }
+    .icon-btn:hover{ transform: translateY(-1px); }
+    .icon-btn:active{ transform: translateY(0) scale(.96); }
+    .done .title{ text-decoration: line-through; color: var(--muted); }
+
+    /* Week grid */
+    .view-toggle{
+      display:flex; gap:8px; justify-content:flex-end; padding: 6px 2px 8px 2px;
+    }
+    .week-grid{
+      display:grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap:8px;
+      user-select:none;
+    }
+    .col{
+      border:1px dashed var(--border);
+      background: var(--bg-2);
+      border-radius: var(--radius);
+      padding:8px;
+      min-height:120px;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .col h4{
+      margin:2px 2px 6px 2px; font-size:12px; color:var(--muted); font-weight:700;
+    }
+    .dragging{ opacity:.6; }
+    .drop-target{ outline: 2px solid var(--accent-cyan); }
+
+    /* Stats */
+    .stats{
+      margin-top:14px; padding:10px; border:1px solid var(--border); background:var(--bg-2); border-radius: var(--radius);
+    }
+    .stat-row{
+      display:flex; align-items:center; gap:8px; margin:6px 0;
+    }
+    .bar{
+      flex:1; height:8px; border-radius:999px; background: var(--bg-3); overflow:hidden;
+      border:1px solid var(--border);
+    }
+    .bar>span{ display:block; height:100%; width:0%; transition: width 240ms ease; }
+
+    /* Modal form */
+    .modal{
+      position:fixed; inset:0; display:none; place-items:center; background: rgba(0,0,0,.45);
+      z-index:100;
+      padding: 20px;
+    }
+    .modal.open{ display:grid; }
+    .sheet{
+      width:100%; max-width: var(--max-w);
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+    .sheet h3{ margin:0 0 10px 0; font-size:18px; font-weight:800; }
+    .grid{
+      display:grid; gap:10px;
+      grid-template-columns: 1fr;
+    }
+    .row-2{ display:grid; gap:10px; grid-template-columns: 1fr 1fr; }
+    .form-help{ font-size:12px; color: var(--muted); }
+    .form-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:8px; }
+    .danger{ border-color:#883b3b; color:#ffb4b4; }
+    .error{ color:#ffb4b4; font-size:13px; }
+
+    /* Small helpers */
+    .sr-only{ position:absolute; width:1px; height:1px; clip:rect(0,0,0,0); overflow:hidden; white-space:nowrap; }
   </style>
 </head>
-<body class="min-h-screen text-slate-800">
-  <div id="root"></div>
-  <!-- rest of file unchanged ... -->
+<body data-theme="dark">
+  <div class="app" id="app" aria-live="polite">
+    <!-- HEADER -->
+    <header class="header" role="banner">
+      <div class="title-row">
+        <h1>Adam’s Leeragenda</h1>
+        <!-- Theme toggle hook (not enabled by default; wire later if gewenst) -->
+        <button id="themeToggle" class="btn" title="Thema wisselen (hook aanwezig)" aria-label="Thema wisselen" style="display:none">Thema</button>
+      </div>
+      <div class="chips" aria-hidden="true">
+        <span class="chip">Krimpenerwaard College</span>
+        <span class="chip">Krimpen aan den IJssel</span>
+        <span class="chip">Gymnasium · klas 1</span>
+      </div>
+      <div class="week-actions" role="toolbar" aria-label="Week acties">
+        <button class="btn" id="prevWeekBtn">Vorige week</button>
+        <button class="btn" id="thisWeekBtn">Deze week</button>
+        <button class="btn" id="nextWeekBtn">Volgende week</button>
+        <button class="btn primary" id="newTaskBtn">Nieuwe taak</button>
+      </div>
+
+      <div class="filters" role="region" aria-label="Zoek en filter">
+        <div class="row">
+          <input id="searchInput" class="input" type="search" placeholder="Zoeken…" aria-label="Zoeken in titel">
+          <select id="subjectFilter" class="select" aria-label="Filter op vak">
+            <option value="Alle">Alle vakken</option>
+          </select>
+        </div>
+        <label class="check"><input id="showDoneToggle" type="checkbox"> Toon afgeronde taken</label>
+        <span class="link-like" id="clearDoneBtn" role="button" tabindex="0" aria-label="Wis afgeronde taken van deze week">Wis afgerond (deze week)</span>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Dagen">
+        <div class="chev" id="chevLeft" aria-label="Vorige dag" role="button">‹</div>
+        <div class="tablist" id="tablist"></div>
+        <div class="chev" id="chevRight" aria-label="Volgende dag" role="button">›</div>
+      </div>
+
+      <div class="view-toggle">
+        <button class="btn" id="toggleViewBtn" aria-pressed="false">Weekoverzicht</button>
+        <button class="btn" id="quickAddBtn">+ Taak toevoegen</button>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main id="main" role="main" tabindex="-1">
+      <section id="dayView" aria-label="Dagweergave">
+        <div class="dayhead">
+          <h2 class="daytitle" id="dayTitle">Maandag 01 jan</h2>
+          <div class="daymeta" id="dayTotal">Totaal: 0 min</div>
+        </div>
+        <div id="taskList"></div>
+      </section>
+
+      <section id="weekView" aria-label="Weekoverzicht" style="display:none">
+        <div class="week-grid" id="weekGrid" aria-describedby="weekHelp"></div>
+        <p id="weekHelp" class="form-help" style="margin-top:10px">Tip: sleep taken naar een andere dag. In de dagweergave gebruik je “🗓” op de kaart om snel naar morgen te verplaatsen.</p>
+      </section>
+
+      <section class="stats" aria-label="Stats per vak (deze week)">
+        <h3 class="sr-only">Stats per vak</h3>
+        <div id="statsList"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL: TASK FORM -->
+  <div class="modal" id="taskModal" aria-modal="true" role="dialog" aria-labelledby="taskModalTitle">
+    <div class="sheet">
+      <h3 id="taskModalTitle">Nieuwe taak</h3>
+      <form id="taskForm" autocomplete="off">
+        <div class="grid">
+          <label>
+            <span>Titel</span>
+            <input class="input" type="text" id="f_title" required placeholder="Bijv. Paragraaf 2 leren">
+          </label>
+          <div class="row-2">
+            <label>
+              <span>Vak</span>
+              <select class="select" id="f_subject" required></select>
+            </label>
+            <label>
+              <span>Soort</span>
+              <select class="select" id="f_type" required>
+                <option>Huiswerk</option>
+                <option>Leerwerk</option>
+                <option>Project</option>
+                <option>Overig</option>
+                <option>Herhaling</option>
+              </select>
+            </label>
+          </div>
+          <div class="row-2">
+            <label>
+              <span>Tijd (minuten)</span>
+              <input class="input" type="number" id="f_estimate" min="1" step="1" required value="25">
+            </label>
+            <label>
+              <span>Plandag</span>
+              <input class="input" type="date" id="f_plannedDate" required>
+            </label>
+          </div>
+          <label>
+            <span>Deadline (toetsdatum)</span>
+            <input class="input" type="date" id="f_dueDate">
+          </label>
+          <label>
+            <span>Notities</span>
+            <textarea class="input" id="f_notes" rows="3" placeholder="Tip: plan kleine blokken en voeg herhaling toe"></textarea>
+          </label>
+
+          <div class="card" aria-label="Verdelen tot deadline">
+            <label class="check"><input type="checkbox" id="f_split"> Verdeel dagelijks t/m de deadline</label>
+            <div class="row-2">
+              <label>
+                <span>Minuten per dag</span>
+                <input class="input" type="number" id="f_splitMinutes" min="5" step="5" value="25">
+              </label>
+              <label class="check" style="align-items:center; margin-top:22px;">
+                <input type="checkbox" id="f_skipWeekend" checked> Weekend overslaan
+              </label>
+            </div>
+            <div class="form-help">Titels worden automatisch genummerd als (1/N).</div>
+          </div>
+
+          <div class="card" aria-label="Herhaling">
+            <label class="check"><input type="checkbox" id="f_repeat"> Herhaling toevoegen (1,3,7)</label>
+            <div class="row-2">
+              <label>
+                <span>Minuten/sessie</span>
+                <input class="input" type="number" id="f_repeatMinutes" min="5" step="5" value="10">
+              </label>
+              <label>
+                <span>Patroon</span>
+                <input class="input" type="text" id="f_repeatPattern" value="1,3,7">
+              </label>
+            </div>
+            <div class="form-help">Alleen positieve getallen, gescheiden door komma’s. Herhalingen vallen binnen het bereik t/m de deadline.</div>
+          </div>
+
+          <div id="formError" class="error" role="alert" style="display:none"></div>
+          <div class="form-actions">
+            <button type="button" class="btn" id="cancelFormBtn">Annuleren</button>
+            <button type="submit" class="btn primary" id="submitFormBtn">Toevoegen</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: QUICK ADD -->
+  <div class="modal" id="quickModal" aria-modal="true" role="dialog" aria-labelledby="quickTitle">
+    <div class="sheet">
+      <h3 id="quickTitle">Snel toevoegen</h3>
+      <form id="quickForm">
+        <div class="grid">
+          <label><span>Titel</span><input class="input" id="q_title" required placeholder="Kort huiswerk"></label>
+          <div class="row-2">
+            <label><span>Vak</span><select class="select" id="q_subject" required></select></label>
+            <label><span>Tijd (minuten)</span><input class="input" id="q_minutes" type="number" min="1" step="1" value="15"></label>
+          </div>
+          <div class="row-2">
+            <label><span>Plandag</span><input class="input" id="q_date" type="date" required></label>
+            <label><span>Soort</span>
+              <select class="select" id="q_type">
+                <option>Huiswerk</option>
+                <option>Leerwerk</option>
+                <option>Overig</option>
+              </select>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" id="quickCancel">Annuleren</button>
+            <button type="submit" class="btn primary">Toevoegen</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  // =========================
+  // CONFIG
+  // =========================
+  const STORAGE_KEY = 'adam-leeragenda-v1';
+  const SUBJECTS = [
+    'Aardrijkskunde','Geschiedenis','Nederlands','Latijn','Wiskunde','Frans','Engels','Biologie'
+  ];
+  // Subject kleuren (accenten consistent op pills, borders, bars)
+  const SUBJECT_COLORS = {
+    'Aardrijkskunde': '#06B6D4', // cyaan
+    'Geschiedenis'  : '#D97706', // donkergeel
+    'Nederlands'    : '#A7F3D0', // lichtgroen
+    'Latijn'        : '#06B6D4',
+    'Wiskunde'      : '#D97706',
+    'Frans'         : '#A7F3D0',
+    'Engels'        : '#06B6D4',
+    'Biologie'      : '#D97706'
+  };
+  const TYPES = ['Huiswerk','Leerwerk','Project','Overig','Herhaling'];
+  const DAYS = ['Ma','Di','Wo','Do','Vr','Za','Zo'];
+
+  // =========================
+  // STATE
+  // =========================
+  const state = {
+    tasks: [],            // array of Task
+    weekStart: startOfWeek(new Date()), // ISO string
+    activeTab: 0,         // 0=Mon .. 6=Sun
+    view: 'day',          // 'day' | 'week'
+    filters: {
+      subject: 'Alle',
+      showDone: false,
+      search: ''
+    },
+    editingId: null       // for edit mode
+  };
+
+  // Task model
+  // { id, title, subject, type, estimate, plannedDate, dueDate?, notes?, done }
+
+  // =========================
+  // UI REFERENCES
+  // =========================
+  const tablistEl = document.getElementById('tablist');
+  const taskListEl = document.getElementById('taskList');
+  const dayTitleEl = document.getElementById('dayTitle');
+  const dayTotalEl = document.getElementById('dayTotal');
+  const statsListEl = document.getElementById('statsList');
+  const weekGridEl = document.getElementById('weekGrid');
+
+  const prevWeekBtn = document.getElementById('prevWeekBtn');
+  const thisWeekBtn = document.getElementById('thisWeekBtn');
+  const nextWeekBtn = document.getElementById('nextWeekBtn');
+  const newTaskBtn  = document.getElementById('newTaskBtn');
+  const toggleViewBtn = document.getElementById('toggleViewBtn');
+  const quickAddBtn = document.getElementById('quickAddBtn');
+
+  const subjectFilter = document.getElementById('subjectFilter');
+  const searchInput = document.getElementById('searchInput');
+  const showDoneToggle = document.getElementById('showDoneToggle');
+  const clearDoneBtn = document.getElementById('clearDoneBtn');
+
+  const chevLeft = document.getElementById('chevLeft');
+  const chevRight = document.getElementById('chevRight');
+
+  const dayView = document.getElementById('dayView');
+  const weekView = document.getElementById('weekView');
+
+  // Task modal refs
+  const taskModal = document.getElementById('taskModal');
+  const taskForm = document.getElementById('taskForm');
+  const formError = document.getElementById('formError');
+  const cancelFormBtn = document.getElementById('cancelFormBtn');
+  const taskModalTitle = document.getElementById('taskModalTitle');
+  const submitFormBtn = document.getElementById('submitFormBtn');
+
+  const f_title = document.getElementById('f_title');
+  const f_subject = document.getElementById('f_subject');
+  const f_type = document.getElementById('f_type');
+  const f_estimate = document.getElementById('f_estimate');
+  const f_plannedDate = document.getElementById('f_plannedDate');
+  const f_dueDate = document.getElementById('f_dueDate');
+  const f_notes = document.getElementById('f_notes');
+  const f_split = document.getElementById('f_split');
+  const f_splitMinutes = document.getElementById('f_splitMinutes');
+  const f_skipWeekend = document.getElementById('f_skipWeekend');
+  const f_repeat = document.getElementById('f_repeat');
+  const f_repeatMinutes = document.getElementById('f_repeatMinutes');
+  const f_repeatPattern = document.getElementById('f_repeatPattern');
+
+  // Quick modal refs
+  const quickModal = document.getElementById('quickModal');
+  const q_title = document.getElementById('q_title');
+  const q_subject = document.getElementById('q_subject');
+  const q_minutes = document.getElementById('q_minutes');
+  const q_date = document.getElementById('q_date');
+  const q_type = document.getElementById('q_type');
+  const quickForm = document.getElementById('quickForm');
+  const quickCancel = document.getElementById('quickCancel');
+
+  // =========================
+  // LOGIC (dates, storage, filters)
+  // =========================
+  function startOfWeek(d){
+    const date = new Date(d);
+    const day = (date.getDay()+6)%7; // Mon=0..Sun=6
+    date.setDate(date.getDate() - day);
+    date.setHours(0,0,0,0);
+    return date;
+  }
+  function fmtISO(d){ return d.toISOString().slice(0,10); }
+  function parseISO(s){
+    const [y,m,dd] = s.split('-').map(Number);
+    const d = new Date(y, m-1, dd);
+    d.setHours(0,0,0,0);
+    return d;
+  }
+  function addDays(d, n){
+    const x = new Date(d);
+    x.setDate(x.getDate()+n);
+    return x;
+  }
+  function isWeekend(d){
+    const day = (d.getDay()+6)%7;
+    return day>=5;
+  }
+
+  function load(){
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      try{
+        const obj = JSON.parse(raw);
+        state.tasks = obj.tasks||[];
+        state.weekStart = obj.weekStart? parseISO(obj.weekStart): startOfWeek(new Date());
+        state.activeTab = obj.activeTab ?? 0;
+        state.view = obj.view || 'day';
+        state.filters = obj.filters || state.filters;
+      }catch(e){}
+    }
+  }
+  function save(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      tasks: state.tasks,
+      weekStart: fmtISO(state.weekStart),
+      activeTab: state.activeTab,
+      view: state.view,
+      filters: state.filters
+    }));
+  }
+
+  function thisWeekDates(){
+    const arr = [];
+    for(let i=0;i<7;i++){ arr.push(addDays(state.weekStart, i)); }
+    return arr;
+  }
+  function activeDate(){
+    return addDays(state.weekStart, state.activeTab);
+  }
+
+  // Filtering
+  function matchesFilters(task){
+    if(state.filters.subject !== 'Alle' && task.subject !== state.filters.subject) return false;
+    if(!state.filters.showDone && task.done) return false;
+    if(state.filters.search){
+      const q = state.filters.search.toLowerCase();
+      if(!task.title.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  }
+
+  // Stats
+  function buildWeeklyStats(){
+    const dates = thisWeekDates().map(fmtISO);
+    const perSubject = {};
+    SUBJECTS.forEach(s=> perSubject[s] = { done:0, total:0 });
+    for(const t of state.tasks){
+      if(dates.includes(t.plannedDate)){
+        if(perSubject[t.subject]){
+          perSubject[t.subject].total += 1;
+          if(t.done) perSubject[t.subject].done += 1;
+        }
+      }
+    }
+    return perSubject;
+  }
+
+  // CRUD
+  function addTask(t){
+    t.id = crypto.randomUUID();
+    state.tasks.push(t);
+  }
+  function updateTask(id, patch){
+    const idx = state.tasks.findIndex(x=>x.id===id);
+    if(idx>-1){
+      state.tasks[idx] = { ...state.tasks[idx], ...patch };
+    }
+  }
+  function deleteTask(id){
+    state.tasks = state.tasks.filter(x=>x.id!==id);
+  }
+  function copyTask(id){
+    const t = state.tasks.find(x=>x.id===id);
+    if(!t) return;
+    const copy = { ...t, id: crypto.randomUUID(), title: t.title + ' (kopie)' };
+    state.tasks.push(copy);
+  }
+  function moveTaskToTomorrow(id){
+    const t = state.tasks.find(x=>x.id===id);
+    if(!t) return;
+    const newDate = fmtISO(addDays(parseISO(t.plannedDate),1));
+    updateTask(id,{ plannedDate: newDate });
+  }
+
+  // Split and repeat
+  function validateSplitAndRepeat(values){
+    const { split, dueDate, plannedDate, repeat, repeatPattern } = values;
+    if(split){
+      if(!dueDate) return 'Bij verdelen is een deadline verplicht.';
+      if(parseISO(dueDate) < parseISO(plannedDate)) return 'Deadline moet op of na de plandag liggen.';
+    }
+    if(repeat && repeatPattern){
+      const ok = repeatPattern.split(',').map(s=>s.trim()).every(x=>/^[1-9]\d*$/.test(x));
+      if(!ok) return 'Patroon alleen positieve gehele getallen, gescheiden door komma’s.';
+    }
+    return null;
+  }
+
+  function planSplitTasks(base){
+    const { title, subject, type, splitMinutes, skipWeekend, plannedDate, dueDate, notes } = base;
+    const start = parseISO(plannedDate);
+    const end = parseISO(dueDate);
+    // Collect days
+    const days = [];
+    let d = new Date(start);
+    while(d<=end){
+      if(!skipWeekend || !isWeekend(d)){
+        days.push(fmtISO(d));
+      }
+      d = addDays(d,1);
+    }
+    const N = days.length || 1;
+    const tasks = days.map((iso, i)=>({
+      id: crypto.randomUUID(),
+      title: `${title} (${i+1}/${N})`,
+      subject, type,
+      estimate: splitMinutes,
+      plannedDate: iso,
+      dueDate: fmtISO(end),
+      notes,
+      done:false
+    }));
+    return tasks;
+  }
+
+  function planRepetitions(baseDateISO, patternStr, repeatMinutes, subject, title, dueDate, notes){
+    const out=[];
+    const start = parseISO(baseDateISO);
+    const end = dueDate ? parseISO(dueDate) : null;
+    const offsets = patternStr.split(',').map(s=>parseInt(s.trim(),10)).filter(n=>n>0);
+    offsets.forEach(off=>{
+      const d = addDays(start, off);
+      if(end && d > end) return;
+      out.push({
+        id: crypto.randomUUID(),
+        title: `${title} · herhaling`,
+        subject,
+        type: 'Herhaling',
+        estimate: repeatMinutes,
+        plannedDate: fmtISO(d),
+        dueDate: dueDate || '',
+        notes,
+        done:false
+      });
+    });
+    return out;
+  }
+
+  // =========================
+  // UI (render)
+  // =========================
+  function renderTabs(){
+    tablistEl.innerHTML='';
+    const dates = thisWeekDates();
+    dates.forEach((d,i)=>{
+      const btn = document.createElement('button');
+      btn.className='tab';
+      btn.setAttribute('role','tab');
+      btn.setAttribute('aria-selected', i===state.activeTab ? 'true':'false');
+      btn.textContent = DAYS[i];
+      btn.addEventListener('click', ()=>{
+        state.activeTab = i;
+        save(); renderAll();
+      });
+      tablistEl.appendChild(btn);
+    });
+  }
+
+  function renderDay(){
+    const date = activeDate();
+    const iso = fmtISO(date);
+    const dayName = date.toLocaleDateString('nl-NL', { weekday:'long' });
+    const dayNum = date.getDate().toString().padStart(2,'0');
+    const month = date.toLocaleDateString('nl-NL', { month:'short' });
+    dayTitleEl.textContent = `${ucfirst(dayName)} ${dayNum} ${month}`;
+
+    // Tasks for that day
+    const todays = state.tasks
+      .filter(t=>t.plannedDate===iso)
+      .filter(matchesFilters)
+      .sort((a,b)=> a.done - b.done || a.subject.localeCompare(b.subject));
+
+    // total minutes
+    const total = todays.reduce((s,t)=> s + (t.done ? 0 : Number(t.estimate||0)),0);
+    dayTotalEl.textContent = total>0 ? `Totaal: ${minutesToText(total)}` : 'Totaal: 0 min';
+
+    taskListEl.innerHTML='';
+    if(todays.length===0){
+      const empty = document.createElement('div');
+      empty.className='card';
+      empty.innerHTML = `<div class="form-help">Geen taken voor deze dag. Tip: gebruik “Nieuwe taak” of “Snel toevoegen”.</div>`;
+      taskListEl.appendChild(empty);
+      return;
+    }
+    todays.forEach(t=> taskListEl.appendChild(taskCard(t)));
+  }
+
+  function taskCard(t){
+    const card = document.createElement('div');
+    card.className = 'card' + (t.done ? ' done':'');
+    card.setAttribute('data-id', t.id);
+
+    const row = document.createElement('div');
+    row.className='task-row';
+
+    // left
+    const left = document.createElement('div');
+    left.className='task-left';
+
+    const check = document.createElement('input');
+    check.type='checkbox';
+    check.checked = !!t.done;
+    check.setAttribute('aria-label','Markeer als gedaan');
+    check.addEventListener('change', ()=>{
+      updateTask(t.id, { done: check.checked });
+      save(); renderAll();
+    });
+
+    const pill = document.createElement('span');
+    pill.className='pill';
+    pill.textContent = t.subject;
+    const color = SUBJECT_COLORS[t.subject] || '#06B6D4';
+    pill.style.borderColor = color;
+    pill.style.boxShadow = `inset 0 0 0 1px ${color}22`;
+    pill.style.background = 'var(--bg-2)';
+
+    left.appendChild(check);
+    left.appendChild(pill);
+
+    // middle
+    const mid = document.createElement('div');
+    const ti = document.createElement('div');
+    ti.className='title';
+    ti.textContent = t.title;
+    const meta = document.createElement('div');
+    meta.className='meta';
+    const type = document.createElement('span'); type.textContent = t.type;
+    const est = document.createElement('span'); est.textContent = `${t.estimate} min`;
+    const due = document.createElement('span'); due.textContent = t.dueDate ? `deadline ${fmtShort(parseISO(t.dueDate))}` : 'geen deadline';
+    meta.append(type, est, due);
+    if(t.notes){
+      const notes = document.createElement('div');
+      notes.className='form-help';
+      notes.textContent = t.notes;
+      notes.style.marginTop='6px';
+      mid.append(ti, meta, notes);
+    }else{
+      mid.append(ti, meta);
+    }
+
+    // actions
+    const act = document.createElement('div');
+    act.className='actions';
+    const btnTomorrow = iconButton('🗓','Naar morgen', ()=>{ moveTaskToTomorrow(t.id); save(); renderAll(); });
+    const btnCopy = iconButton('📄','Kopieer', ()=>{ copyTask(t.id); save(); renderAll(); });
+    const btnEdit = iconButton('✏️','Bewerk', ()=>{ openForm('edit', t); });
+    const btnDelete = iconButton('🗑','Verwijder', ()=>{
+      if(confirm('Taak verwijderen?')){ deleteTask(t.id); save(); renderAll(); }
+    });
+    act.append(btnTomorrow, btnCopy, btnEdit, btnDelete);
+
+    row.append(left, mid, act);
+    card.appendChild(row);
+    return card;
+  }
+
+  function renderWeek(){
+    weekGridEl.innerHTML='';
+    const dates = thisWeekDates();
+    dates.forEach((d,i)=>{
+      const iso = fmtISO(d);
+      const col = document.createElement('div');
+      col.className='col';
+      col.dataset.dayIndex = i;
+      col.dataset.date = iso;
+      col.setAttribute('role','group');
+      col.setAttribute('aria-label', `${DAYS[i]} ${fmtShort(d)}`);
+      // header
+      const h = document.createElement('h4');
+      h.textContent = `${DAYS[i]} ${d.getDate().toString().padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+      col.appendChild(h);
+
+      // tasks
+      const tasks = state.tasks.filter(t=>t.plannedDate===iso).filter(matchesFilters).sort((a,b)=> a.done-b.done || a.subject.localeCompare(b.subject));
+      tasks.forEach(t=>{
+        const item = document.createElement('div');
+        item.className='card' + (t.done?' done':'');
+        item.draggable = true;
+        item.dataset.id = t.id;
+        item.innerHTML = `
+          <div class="task-row">
+            <div class="task-left">
+              <span class="pill" style="border-color:${SUBJECT_COLORS[t.subject]||'#06B6D4'}">${t.subject}</span>
+            </div>
+            <div>
+              <div class="title">${escapeHTML(t.title)}</div>
+              <div class="meta">${t.type} · ${t.estimate} min</div>
+            </div>
+            <div class="actions">
+              <button class="icon-btn" title="Bewerk" aria-label="Bewerk">✏️</button>
+            </div>
+          </div>`;
+        item.querySelector('.icon-btn').addEventListener('click', ()=>openForm('edit', t));
+
+        // DnD
+        item.addEventListener('dragstart', (e)=>{
+          item.classList.add('dragging');
+          e.dataTransfer.setData('text/plain', t.id);
+        });
+        item.addEventListener('dragend', ()=> item.classList.remove('dragging'));
+        col.appendChild(item);
+      });
+
+      // drop handlers
+      col.addEventListener('dragover', (e)=>{ e.preventDefault(); col.classList.add('drop-target'); });
+      col.addEventListener('dragleave', ()=> col.classList.remove('drop-target'));
+      col.addEventListener('drop', (e)=>{
+        e.preventDefault();
+        col.classList.remove('drop-target');
+        const id = e.dataTransfer.getData('text/plain');
+        if(!id) return;
+        updateTask(id, { plannedDate: iso });
+        save(); renderAll();
+      });
+
+      weekGridEl.appendChild(col);
+    });
+  }
+
+  function renderStats(){
+    statsListEl.innerHTML='';
+    const per = buildWeeklyStats();
+    SUBJECTS.forEach(s=>{
+      const row = document.createElement('div');
+      row.className='stat-row';
+      const label = document.createElement('div');
+      label.style.minWidth='120px';
+      label.textContent = s;
+      const bar = document.createElement('div');
+      bar.className='bar';
+      const fill = document.createElement('span');
+      const total = per[s].total || 0;
+      const done = per[s].done || 0;
+      const pct = total? Math.round(done/total*100): 0;
+      fill.style.width = pct + '%';
+      fill.style.background = SUBJECT_COLORS[s] || '#06B6D4';
+      bar.appendChild(fill);
+
+      const txt = document.createElement('div');
+      txt.style.minWidth='70px';
+      txt.style.textAlign='right';
+      txt.textContent = `${done}/${total}`;
+      row.append(label, bar, txt);
+      statsListEl.appendChild(row);
+    });
+  }
+
+  function renderFiltersInit(){
+    // subject selects
+    subjectFilter.innerHTML = `<option value="Alle">Alle vakken</option>` + SUBJECTS.map(s=> `<option>${s}</option>`).join('');
+    f_subject.innerHTML = SUBJECTS.map(s=> `<option>${s}</option>`).join('');
+    q_subject.innerHTML = SUBJECTS.map(s=> `<option>${s}</option>`).join('');
+  }
+
+  function renderAll(){
+    renderTabs();
+    if(state.view==='day'){
+      dayView.style.display='block';
+      weekView.style.display='none';
+      renderDay();
+    }else{
+      dayView.style.display='none';
+      weekView.style.display='block';
+      renderWeek();
+    }
+    renderStats();
+    // set filter UI values
+    subjectFilter.value = state.filters.subject;
+    showDoneToggle.checked = state.filters.showDone;
+    searchInput.value = state.filters.search;
+    toggleViewBtn.textContent = state.view==='day' ? 'Weekoverzicht' : 'Dagweergave';
+    toggleViewBtn.setAttribute('aria-pressed', state.view==='week');
+  }
+
+  // =========================
+  // UI HELPERS
+  // =========================
+  function iconButton(char, label, onClick){
+    const btn = document.createElement('button');
+    btn.className='icon-btn';
+    btn.setAttribute('title', label);
+    btn.setAttribute('aria-label', label);
+    btn.textContent = char;
+    btn.addEventListener('click', onClick);
+    return btn;
+  }
+  function minutesToText(min){
+    const h = Math.floor(min/60);
+    const m = min%60;
+    if(h===0) return `${m} min`;
+    if(m===0) return `${h} u`;
+    return `${h} u ${m} min`;
+  }
+  function fmtShort(d){
+    return d.toLocaleDateString('nl-NL',{ day:'2-digit', month:'2-digit' });
+  }
+  function ucfirst(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+  function escapeHTML(s){ return s.replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  // =========================
+  // EVENTS
+  // =========================
+  // Week navigation
+  prevWeekBtn.addEventListener('click', ()=>{ state.weekStart = addDays(state.weekStart, -7); save(); renderAll(); });
+  thisWeekBtn.addEventListener('click', ()=>{ state.weekStart = startOfWeek(new Date()); save(); renderAll(); });
+  nextWeekBtn.addEventListener('click', ()=>{ state.weekStart = addDays(state.weekStart, 7); save(); renderAll(); });
+
+  // View toggle
+  toggleViewBtn.addEventListener('click', ()=>{
+    state.view = state.view==='day' ? 'week':'day';
+    save(); renderAll();
+  });
+
+  // Quick add
+  quickAddBtn.addEventListener('click', ()=>{
+    const d = fmtISO(activeDate());
+    q_title.value='';
+    q_subject.value=SUBJECTS[0];
+    q_minutes.value=15;
+    q_date.value=d;
+    q_type.value='Huiswerk';
+    openQuick(true);
+  });
+  quickCancel.addEventListener('click', ()=> openQuick(false));
+  quickForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const t = {
+      id:'',
+      title: q_title.value.trim(),
+      subject: q_subject.value,
+      type: q_type.value,
+      estimate: Number(q_minutes.value)||0,
+      plannedDate: q_date.value,
+      dueDate: '',
+      notes:'',
+      done:false
+    };
+    if(!t.title){ return; }
+    addTask(t); save(); openQuick(false); renderAll();
+  });
+
+  // Filters
+  subjectFilter.addEventListener('change', ()=>{
+    state.filters.subject = subjectFilter.value;
+    save(); renderAll();
+  });
+  showDoneToggle.addEventListener('change', ()=>{
+    state.filters.showDone = showDoneToggle.checked;
+    save(); renderAll();
+  });
+  searchInput.addEventListener('input', ()=>{
+    state.filters.search = searchInput.value;
+    renderAll();
+  });
+  clearDoneBtn.addEventListener('click', ()=>{
+    const dates = thisWeekDates().map(fmtISO);
+    const before = state.tasks.length;
+    state.tasks = state.tasks.filter(t=> !(t.done && dates.includes(t.plannedDate)));
+    const removed = before - state.tasks.length;
+    if(removed>0){ save(); renderAll(); }
+  });
+  clearDoneBtn.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); clearDoneBtn.click(); } });
+
+  // Tabs chevrons
+  chevLeft.addEventListener('click', ()=>{
+    if(state.activeTab>0){ state.activeTab--; save(); renderAll(); }
+  });
+  chevRight.addEventListener('click', ()=>{
+    if(state.activeTab<6){ state.activeTab++; save(); renderAll(); }
+  });
+
+  // Keyboard arrows (desktop)
+  window.addEventListener('keydown', (e)=>{
+    if(e.key==='ArrowLeft'){ if(state.activeTab>0){ state.activeTab--; save(); renderAll(); } }
+    if(e.key==='ArrowRight'){ if(state.activeTab<6){ state.activeTab++; save(); renderAll(); } }
+  });
+
+  // Swipe between day tabs (mobile)
+  let touchStartX = null;
+  document.addEventListener('touchstart', (e)=>{ if(e.touches.length===1){ touchStartX = e.touches[0].clientX; } }, {passive:true});
+  document.addEventListener('touchend', (e)=>{
+    if(touchStartX==null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if(Math.abs(dx)>60){
+      if(dx<0 && state.activeTab<6){ state.activeTab++; save(); renderAll(); }
+      if(dx>0 && state.activeTab>0){ state.activeTab--; save(); renderAll(); }
+    }
+    touchStartX = null;
+  });
+
+  // Task modal open
+  newTaskBtn.addEventListener('click', ()=> openForm('new'));
+  cancelFormBtn.addEventListener('click', ()=> closeForm());
+  taskModal.addEventListener('click', (e)=>{ if(e.target===taskModal) closeForm(); });
+
+  // Form submit
+  taskForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const values = {
+      title: f_title.value.trim(),
+      subject: f_subject.value,
+      type: f_type.value,
+      estimate: Number(f_estimate.value)||0,
+      plannedDate: f_plannedDate.value,
+      dueDate: f_dueDate.value || '',
+      notes: f_notes.value.trim(),
+      split: f_split.checked,
+      splitMinutes: Number(f_splitMinutes.value)||25,
+      skipWeekend: f_skipWeekend.checked,
+      repeat: f_repeat.checked,
+      repeatMinutes: Number(f_repeatMinutes.value)||10,
+      repeatPattern: f_repeatPattern.value.trim()
+    };
+    const err = validateSplitAndRepeat(values);
+    if(err){ formError.textContent = err; formError.style.display='block'; return; }
+    formError.style.display='none';
+
+    if(state.editingId){
+      // editing existing single task only; if split is toggled we replace with many
+      if(values.split && values.dueDate){
+        // remove the original task and replace with split set
+        deleteTask(state.editingId);
+        const base = {
+          title: values.title, subject: values.subject, type: values.type,
+          splitMinutes: values.splitMinutes, skipWeekend: values.skipWeekend,
+          plannedDate: values.plannedDate, dueDate: values.dueDate, notes: values.notes
+        };
+        const set = planSplitTasks(base);
+        set.forEach(t=> state.tasks.push(t));
+        // optional repetitions for each slice
+        if(values.repeat && values.repeatPattern){
+          set.forEach(slice=>{
+            const reps = planRepetitions(slice.plannedDate, values.repeatPattern, values.repeatMinutes, slice.subject, slice.title.replace(/\s\(\d+\/\d+\)$/,''), values.dueDate, values.notes);
+            reps.forEach(r=> state.tasks.push(r));
+          });
+        }
+      }else{
+        // simple update
+        updateTask(state.editingId, {
+          title: values.title, subject: values.subject, type: values.type,
+          estimate: values.estimate, plannedDate: values.plannedDate, dueDate: values.dueDate, notes: values.notes
+        });
+        // optional repetitions from base plannedDate
+        if(values.repeat && values.repeatPattern){
+          const reps = planRepetitions(values.plannedDate, values.repeatPattern, values.repeatMinutes, values.subject, values.title, values.dueDate, values.notes);
+          reps.forEach(r=> state.tasks.push(r));
+        }
+      }
+    }else{
+      if(values.split && values.dueDate){
+        const base = {
+          title: values.title, subject: values.subject, type: values.type,
+          splitMinutes: values.splitMinutes, skipWeekend: values.skipWeekend,
+          plannedDate: values.plannedDate, dueDate: values.dueDate, notes: values.notes
+        };
+        const set = planSplitTasks(base);
+        set.forEach(t=> state.tasks.push(t));
+        if(values.repeat && values.repeatPattern){
+          set.forEach(slice=>{
+            const reps = planRepetitions(slice.plannedDate, values.repeatPattern, values.repeatMinutes, slice.subject, slice.title.replace(/\s\(\d+\/\d+\)$/,''), values.dueDate, values.notes);
+            reps.forEach(r=> state.tasks.push(r));
+          });
+        }
+      }else{
+        const t = {
+          id: crypto.randomUUID(),
+          title: values.title, subject: values.subject, type: values.type,
+          estimate: values.estimate, plannedDate: values.plannedDate,
+          dueDate: values.dueDate, notes: values.notes, done:false
+        };
+        state.tasks.push(t);
+        if(values.repeat && values.repeatPattern){
+          const reps = planRepetitions(values.plannedDate, values.repeatPattern, values.repeatMinutes, values.subject, values.title, values.dueDate, values.notes);
+          reps.forEach(r=> state.tasks.push(r));
+        }
+      }
+    }
+
+    save(); closeForm(); renderAll();
+  });
+
+  // =========================
+  // UI: OPEN/CLOSE FORMS
+  // =========================
+  function openForm(mode, task=null){
+    taskModal.classList.add('open');
+    document.body.style.overflow='hidden';
+    formError.style.display='none';
+
+    if(mode==='edit' && task){
+      state.editingId = task.id;
+      taskModalTitle.textContent = 'Taak bewerken';
+      submitFormBtn.textContent = 'Opslaan';
+      f_title.value = task.title;
+      f_subject.value = task.subject;
+      f_type.value = task.type;
+      f_estimate.value = task.estimate;
+      f_plannedDate.value = task.plannedDate;
+      f_dueDate.value = task.dueDate || '';
+      f_notes.value = task.notes || '';
+      f_split.checked = false;
+      f_repeat.checked = false;
+    }else{
+      state.editingId = null;
+      taskModalTitle.textContent = 'Nieuwe taak';
+      submitFormBtn.textContent = 'Toevoegen';
+      f_title.value = '';
+      f_subject.value = SUBJECTS[0];
+      f_type.value = 'Huiswerk';
+      f_estimate.value = 25;
+      f_plannedDate.value = fmtISO(activeDate());
+      f_dueDate.value = '';
+      f_notes.value = '';
+      f_split.checked = false;
+      f_skipWeekend.checked = true;
+      f_splitMinutes.value = 25;
+      f_repeat.checked = false;
+      f_repeatMinutes.value = 10;
+      f_repeatPattern.value = '1,3,7';
+    }
+  }
+  function closeForm(){
+    taskModal.classList.remove('open');
+    document.body.style.overflow='';
+  }
+  function openQuick(flag){
+    quickModal.classList.toggle('open', !!flag);
+    document.body.style.overflow = flag ? 'hidden':'';
+  }
+
+  // =========================
+  // INIT
+  // =========================
+  function init(){
+    load();
+    renderFiltersInit();
+
+    // Ensure subject filter persists
+    subjectFilter.value = state.filters.subject || 'Alle';
+    showDoneToggle.checked = !!state.filters.showDone;
+    searchInput.value = state.filters.search || '';
+
+    renderAll();
+  }
+
+  // Utilities for theme toggle (hook present but off by default)
+  document.getElementById('themeToggle').addEventListener('click', ()=>{
+    const cur = document.body.getAttribute('data-theme') || 'dark';
+    document.body.setAttribute('data-theme', cur==='dark' ? 'light':'dark');
+  });
+
+  // Accessibility focus to main after render
+  function focusMain(){ document.getElementById('main').focus(); }
+
+  // Start
+  init();
+
+  </script>
 </body>
 </html>
