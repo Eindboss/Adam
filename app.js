@@ -438,3 +438,6 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
+// Ready marker for bootloader
+window.__APP_READY = true;

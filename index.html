@@ -7,14 +7,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link href="./styles.css" rel="stylesheet">
   <script src="./theme.js" defer></script>
+  <script src="./app.boot.js" defer></script>
 </head>
 <body data-theme="dark">
   <div class="app" id="app" aria-live="polite">
-    <!-- HEADER -->
     <header class="header" role="banner">
       <div class="title-row">
         <h1>Adam’s Leeragenda</h1>
-        <button id="themeToggle" class="btn" title="Wissel tussen donker/licht thema" aria-label="Wissel thema">🌗 Thema</button>
+        <button id="themeToggle" class="btn" title="Wissel tussen donker/licht thema" aria-label="Wissel thema">🌗 Donker thema</button>
       </div>
 
       <div class="chips" aria-hidden="true">
@@ -53,7 +53,6 @@
       </div>
     </header>
 
-    <!-- MAIN -->
     <main id="main" role="main" tabindex="-1">
       <section id="dayView" aria-label="Dagweergave">
         <div class="dayhead">
@@ -75,14 +74,13 @@
     </main>
   </div>
 
-  <!-- MODAL: TASK FORM -->
+  <!-- MODALS -->
   <div class="modal" id="taskModal" aria-modal="true" role="dialog" aria-labelledby="taskModalTitle">
     <div class="sheet">
       <h3 id="taskModalTitle">Nieuwe taak</h3>
       <form id="taskForm" autocomplete="off">
         <div class="grid">
           <label><span>Titel</span><input class="input" type="text" id="f_title" required placeholder="Bijv. Paragraaf 2 leren"></label>
-
           <div class="row-2">
             <label><span>Vak</span><select class="select" id="f_subject" required></select></label>
             <label><span>Soort</span>
@@ -91,15 +89,12 @@
               </select>
             </label>
           </div>
-
           <div class="row-2">
             <label><span>Tijd (minuten)</span><input class="input" type="number" id="f_estimate" min="1" step="1" required value="25"></label>
             <label><span>Plandag</span><input class="input" type="date" id="f_plannedDate" required></label>
           </div>
-
           <label><span>Deadline (toetsdatum)</span><input class="input" type="date" id="f_dueDate"></label>
           <label><span>Notities</span><textarea class="input" id="f_notes" rows="3" placeholder="Tip: plan kleine blokken en voeg herhaling toe"></textarea></label>
-
           <div class="card" aria-label="Verdelen tot deadline">
             <label class="check"><input type="checkbox" id="f_split"> Verdeel dagelijks t/m de deadline</label>
             <div class="row-2">
@@ -108,7 +103,6 @@
             </div>
             <div class="form-help">Titels worden automatisch genummerd als (1/N).</div>
           </div>
-
           <div class="card" aria-label="Herhaling">
             <label class="check"><input type="checkbox" id="f_repeat"> Herhaling toevoegen (1,3,7)</label>
             <div class="row-2">
@@ -117,7 +111,6 @@
             </div>
             <div class="form-help">Alleen positieve getallen, gescheiden door komma’s. Herhalingen vallen binnen het bereik t/m de deadline.</div>
           </div>
-
           <div id="formError" class="error" role="alert" style="display:none"></div>
           <div class="form-actions">
             <button type="button" class="btn" id="cancelFormBtn">Annuleren</button>
@@ -128,7 +121,6 @@
     </div>
   </div>
 
-  <!-- MODAL: QUICK ADD -->
   <div class="modal" id="quickModal" aria-modal="true" role="dialog" aria-labelledby="quickTitle">
     <div class="sheet">
       <h3 id="quickTitle">Snel toevoegen</h3>
@@ -155,7 +147,5 @@
       </form>
     </div>
   </div>
-
-  <script src="./app.js" defer></script>
 </body>
 </html>
