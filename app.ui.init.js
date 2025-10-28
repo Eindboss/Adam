@@ -16,7 +16,7 @@
     el.f_title = q('#f_title'); el.f_subject = q('#f_subject'); el.f_type = q('#f_type'); el.f_estimate = q('#f_estimate'); el.f_plannedDate = q('#f_plannedDate'); el.f_dueDate = q('#f_dueDate'); el.f_notes = q('#f_notes'); el.f_split = q('#f_split'); el.f_splitMinutes = q('#f_splitMinutes'); el.f_skipWeekend = q('#f_skipWeekend'); el.f_repeat = q('#f_repeat'); el.f_repeatMinutes = q('#f_repeatMinutes'); el.f_repeatPattern = q('#f_repeatPattern');
     el.quickModal = q('#quickModal'); el.q_title = q('#q_title'); el.q_subject = q('#q_subject'); el.q_minutes = q('#q_minutes'); el.q_date = q('#q_date'); el.q_type = q('#q_type'); el.quickForm = q('#quickForm'); el.quickCancel = q('#quickCancel');
 
-    C.load(); UI.render.renderFiltersInit(); UI.render.renderAll(); UI.events.wireEvents();
+    C.load(); document.documentElement.setAttribute('data-view', C.state.view||'week'); UI.render.renderFiltersInit(); UI.render.renderAll(); UI.events.wireEvents();
     window.__APP_READY = true;
   }
 

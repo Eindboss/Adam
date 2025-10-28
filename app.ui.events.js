@@ -13,7 +13,7 @@
     el.thisWeekBtn.onclick=()=>{ C.state.weekStart=C.startOfWeek(new Date()); C.save(); R.renderAll(); };
     el.nextWeekBtn.onclick=()=>{ C.state.weekStart=C.addDays(C.state.weekStart,7); C.save(); R.renderAll(); };
 
-    el.toggleViewBtn.onclick=()=>{ C.state.view = C.state.view==='day' ? 'week':'day'; C.save(); R.renderAll(); };
+    el.toggleViewBtn.onclick=()=>{ C.state.view = C.state.view==='day' ? 'week':'day'; document.documentElement.setAttribute('data-view', C.state.view); C.save(); R.renderAll(); };
 
     el.quickAddBtn.onclick=()=>{
       const d=C.fmtISO(C.activeDate());
@@ -116,7 +116,7 @@
       }
 
       C.save(); UI.forms.closeForm(); UI.render.renderAll();
-    };
+    });
 
     // Focus trap
     ['taskModal','quickModal'].forEach(id=>{
@@ -131,6 +131,65 @@
       });
     });
   }
+
+
+    // ----- Touch drag & drop for mobile (move cards between week columns) -----
+    (function enableTouchDrag(){
+      const grid = UI.el.weekGridEl;
+      if(!grid) return;
+
+      let dragging = null;           // the card element
+      let startX = 0, startY = 0;
+      let currentTargetCol = null;
+
+      function colFromPoint(x,y){
+        const el = document.elementFromPoint(x,y);
+        if(!el) return null;
+        return el.closest('.week-grid .col');
+      }
+
+      function clearHighlight(){
+        if(currentTargetCol){ currentTargetCol.classList.remove('drop-target'); currentTargetCol=null; }
+      }
+
+      grid.addEventListener('touchstart', (e)=>{
+        const card = e.target.closest('.card');
+        if(!card) return;
+        dragging = card;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        card.classList.add('dragging');
+      }, {passive:true});
+
+      grid.addEventListener('touchmove', (e)=>{
+        if(!dragging) return;
+        const t = e.touches[0];
+        const col = colFromPoint(t.clientX, t.clientY);
+        if(col !== currentTargetCol){
+          clearHighlight();
+          if(col){ currentTargetCol = col; col.classList.add('drop-target'); }
+        }
+      }, {passive:true});
+
+      grid.addEventListener('touchend', (e)=>{
+        if(!dragging) return;
+        const t = e.changedTouches[0];
+        const col = colFromPoint(t.clientX, t.clientY);
+        const card = dragging;
+        dragging.classList.remove('dragging');
+        dragging = null;
+        clearHighlight();
+
+        if(!col) return;
+        const newDate = col.dataset.date;
+        const id = card.dataset.id;
+        if(newDate && id){
+          C.updateTask(id, { plannedDate: newDate });
+          C.save();
+          R.renderAll();
+        }
+      });
+    })();
 
   UI.events = { wireEvents };
 })();
