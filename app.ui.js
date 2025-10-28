@@ -7,6 +7,22 @@
   const qs = (s)=>document.querySelector(s);
   function ce(tag, cls){ const el=document.createElement(tag); if(cls) el.className=cls; return el; }
 
+  // Safe helper: remove trailing " (n/N)" slice suffix without regex
+  function isAllDigits(str){ if(!str) return false; for(let i=0;i<str.length;i++){ const c=str.charCodeAt(i); if(c<48||c>57) return false; } return true; }
+  function stripSliceSuffix(title){
+    if(!title) return title;
+    if(!title.endsWith(')')) return title;
+    const openIdx = title.lastIndexOf(' (');
+    if(openIdx === -1) return title;
+    const inside = title.slice(openIdx + 2, -1); // between "( .. )"
+    const parts = inside.split('/');
+    if(parts.length !== 2) return title;
+    if(isAllDigits(parts[0]) && isAllDigits(parts[1])){
+      return title.slice(0, openIdx);
+    }
+    return title;
+  }
+
   let tablistEl, taskListEl, dayTitleEl, dayTotalEl, statsListEl, weekGridEl;
   let prevWeekBtn, thisWeekBtn, nextWeekBtn, newTaskBtn, toggleViewBtn, quickAddBtn;
   let subjectFilter, searchInput, showDoneToggle, clearDoneBtn;
@@ -242,7 +258,7 @@
           set.forEach(t=>C.state.tasks.push(t));
           if(v.repeat && v.repeatPattern){
             set.forEach(slice=>{
-              const reps=C.planRepetitions(slice.plannedDate, v.repeatPattern, v.repeatMinutes, slice.subject, slice.title.replace(/\\s\\(\\d+\\/\\d+\\)$/, ''), v.dueDate, v.notes);
+              const reps=C.planRepetitions(slice.plannedDate, v.repeatPattern, v.repeatMinutes, slice.subject, stripSliceSuffix(slice.title), v.dueDate, v.notes);
               reps.forEach(r=>C.state.tasks.push(r));
             });
           }
@@ -259,7 +275,7 @@
           set.forEach(t=>C.state.tasks.push(t));
           if(v.repeat && v.repeatPattern){
             set.forEach(slice=>{
-              const reps=C.planRepetitions(slice.plannedDate, v.repeatPattern, v.repeatMinutes, slice.subject, slice.title.replace(/\\s\\(\\d+\\/\\d+\\)$/, ''), v.dueDate, v.notes);
+              const reps=C.planRepetitions(slice.plannedDate, v.repeatPattern, v.repeatMinutes, slice.subject, stripSliceSuffix(slice.title), v.dueDate, v.notes);
               reps.forEach(r=>C.state.tasks.push(r));
             });
           }
