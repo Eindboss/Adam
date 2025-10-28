@@ -8,7 +8,6 @@ const SUBJECT_COLORS = {
 const TYPES = ['Huiswerk','Leerwerk','Project','Overig','Herhaling'];
 const DAYS = ['Ma','Di','Wo','Do','Vr','Za','Zo'];
 
-<<<<<<< HEAD
 // ---- SAFE UTILITIES / POLYFILLS ----
 const uid = (() => {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -31,8 +30,6 @@ function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; 
 function isWeekend(d){ const day=(d.getDay()+6)%7; return day>=5; }
 function fmtShort(d){ return d.toLocaleDateString('nl-NL',{day:'2-digit',month:'2-digit'}); }
 
-=======
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31
 // STATE
 const state = {
   tasks: [],
@@ -44,7 +41,6 @@ const state = {
 };
 
 // UI REFS
-<<<<<<< HEAD
 let tablistEl, taskListEl, dayTitleEl, dayTotalEl, statsListEl, weekGridEl;
 let prevWeekBtn, thisWeekBtn, nextWeekBtn, newTaskBtn, toggleViewBtn, quickAddBtn;
 let subjectFilter, searchInput, showDoneToggle, clearDoneBtn;
@@ -54,77 +50,11 @@ let f_title, f_subject, f_type, f_estimate, f_plannedDate, f_dueDate, f_notes, f
 let quickModal, q_title, q_subject, q_minutes, q_date, q_type, quickForm, quickCancel;
 
 // STORAGE
-=======
-const tablistEl = qs('#tablist');
-const taskListEl = qs('#taskList');
-const dayTitleEl = qs('#dayTitle');
-const dayTotalEl = qs('#dayTotal');
-const statsListEl = qs('#statsList');
-const weekGridEl = qs('#weekGrid');
-
-const prevWeekBtn = qs('#prevWeekBtn');
-const thisWeekBtn = qs('#thisWeekBtn');
-const nextWeekBtn = qs('#nextWeekBtn');
-const newTaskBtn  = qs('#newTaskBtn');
-const toggleViewBtn = qs('#toggleViewBtn');
-const quickAddBtn = qs('#quickAddBtn');
-
-const subjectFilter = qs('#subjectFilter');
-const searchInput = qs('#searchInput');
-const showDoneToggle = qs('#showDoneToggle');
-const clearDoneBtn = qs('#clearDoneBtn');
-
-const chevLeft = qs('#chevLeft');
-const chevRight = qs('#chevRight');
-
-const dayView = qs('#dayView');
-const weekView = qs('#weekView');
-
-// Modals & forms
-const taskModal = qs('#taskModal');
-const taskForm = qs('#taskForm');
-const formError = qs('#formError');
-const cancelFormBtn = qs('#cancelFormBtn');
-const taskModalTitle = qs('#taskModalTitle');
-const submitFormBtn = qs('#submitFormBtn');
-
-const f_title = qs('#f_title');
-const f_subject = qs('#f_subject');
-const f_type = qs('#f_type');
-const f_estimate = qs('#f_estimate');
-const f_plannedDate = qs('#f_plannedDate');
-const f_dueDate = qs('#f_dueDate');
-const f_notes = qs('#f_notes');
-const f_split = qs('#f_split');
-const f_splitMinutes = qs('#f_splitMinutes');
-const f_skipWeekend = qs('#f_skipWeekend');
-const f_repeat = qs('#f_repeat');
-const f_repeatMinutes = qs('#f_repeatMinutes');
-const f_repeatPattern = qs('#f_repeatPattern');
-
-const quickModal = qs('#quickModal');
-const q_title = qs('#q_title');
-const q_subject = qs('#q_subject');
-const q_minutes = qs('#q_minutes');
-const q_date = qs('#q_date');
-const q_type = qs('#q_type');
-const quickForm = qs('#quickForm');
-const quickCancel = qs('#quickCancel');
-
-// DATE & STORAGE HELPERS
-function startOfWeek(d){ const date=new Date(d); const day=(date.getDay()+6)%7; date.setDate(date.getDate()-day); date.setHours(0,0,0,0); return date; }
-function fmtISO(d){ return d.toISOString().slice(0,10); }
-function parseISO(s){ const [y,m,dd]=s.split('-').map(Number); const d=new Date(y,m-1,dd); d.setHours(0,0,0,0); return d; }
-function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
-function isWeekend(d){ const day=(d.getDay()+6)%7; return day>=5; }
-
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31
 function load(){
   const raw = localStorage.getItem(STORAGE_KEY);
   if(!raw) return;
   try{
     const obj=JSON.parse(raw);
-<<<<<<< HEAD
     state.tasks = Array.isArray(obj.tasks) ? obj.tasks : [];
     state.weekStart = obj.weekStart ? parseISO(obj.weekStart) : startOfWeek(new Date());
     state.activeTab = Number.isInteger(obj.activeTab) ? obj.activeTab : 0;
@@ -144,23 +74,6 @@ function save(){
       filters: state.filters
     }));
   }catch(e){}
-=======
-    state.tasks = obj.tasks||[];
-    state.weekStart = obj.weekStart? parseISO(obj.weekStart): startOfWeek(new Date());
-    state.activeTab = obj.activeTab ?? 0;
-    state.view = obj.view || 'day';
-    state.filters = obj.filters || state.filters;
-  }catch{}
-}
-function save(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    tasks: state.tasks,
-    weekStart: fmtISO(state.weekStart),
-    activeTab: state.activeTab,
-    view: state.view,
-    filters: state.filters
-  }));
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31
 }
 
 function thisWeekDates(){ return Array.from({length:7},(_,i)=>addDays(state.weekStart,i)); }
@@ -188,17 +101,10 @@ function buildWeeklyStats(){
 }
 
 // CRUD
-<<<<<<< HEAD
 function addTask(t){ t.id = uid(); state.tasks.push(t); }
 function updateTask(id,patch){ const i=state.tasks.findIndex(x=>x.id===id); if(i>-1) state.tasks[i]={...state.tasks[i],...patch}; }
 function deleteTask(id){ state.tasks = state.tasks.filter(x=>x.id!==id); }
 function copyTask(id){ const t=state.tasks.find(x=>x.id===id); if(!t) return; state.tasks.push({...t,id:uid(),title:t.title+' (kopie)'}); }
-=======
-function addTask(t){ t.id=crypto.randomUUID(); state.tasks.push(t); }
-function updateTask(id,patch){ const i=state.tasks.findIndex(x=>x.id===id); if(i>-1) state.tasks[i]={...state.tasks[i],...patch}; }
-function deleteTask(id){ state.tasks = state.tasks.filter(x=>x.id!==id); }
-function copyTask(id){ const t=state.tasks.find(x=>x.id===id); if(!t) return; state.tasks.push({...t,id:crypto.randomUUID(),title:t.title+' (kopie)'}); }
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31
 function moveTaskToTomorrow(id){ const t=state.tasks.find(x=>x.id===id); if(!t) return; updateTask(id,{plannedDate: fmtISO(addDays(parseISO(t.plannedDate),1))}); }
 
 // SPLIT & REPEAT
@@ -219,22 +125,14 @@ function planSplitTasks(base){
   const days=[]; let d=new Date(start);
   while(d<=end){ if(!skipWeekend || !isWeekend(d)) days.push(fmtISO(d)); d=addDays(d,1); }
   const N=days.length||1;
-<<<<<<< HEAD
   return days.map((iso,i)=>({ id:uid(), title:`${title} (${i+1}/${N})`, subject, type, estimate:splitMinutes, plannedDate:iso, dueDate:fmtISO(end), notes, done:false }));
-=======
-  return days.map((iso,i)=>({ id:crypto.randomUUID(), title:`${title} (${i+1}/${N})`, subject, type, estimate:splitMinutes, plannedDate:iso, dueDate:fmtISO(end), notes, done:false }));
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31
 }
 function planRepetitions(baseISO, patternStr, repeatMinutes, subject, title, dueDate, notes){
   const out=[]; const start=parseISO(baseISO); const end= dueDate? parseISO(dueDate): null;
   const offs=patternStr.split(',').map(s=>parseInt(s.trim(),10)).filter(n=>n>0);
   offs.forEach(off=>{
     const d=addDays(start,off); if(end && d>end) return;
-<<<<<<< HEAD
     out.push({ id:uid(), title:`${title} · herhaling`, subject, type:'Herhaling', estimate:repeatMinutes, plannedDate:fmtISO(d), dueDate:dueDate||'', notes, done:false });
-=======
-    out.push({ id:crypto.randomUUID(), title:`${title} · herhaling`, subject, type:'Herhaling', estimate:repeatMinutes, plannedDate:fmtISO(d), dueDate:dueDate||'', notes, done:false });
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31
   });
   return out;
 }
@@ -309,13 +207,9 @@ function renderWeek(){
     const h=ce('h4'); h.textContent=`${DAYS[i]} ${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
     col.appendChild(h);
 
-<<<<<<< HEAD
     const tasks=state.tasks.filter(t=>t.plannedDate===iso).filter(matchesFilters)
       .sort((a,b)=> a.done-b.done || a.subject.localeCompare(b.subject));
 
-=======
-    const tasks=state.tasks.filter(t=>t.plannedDate===iso).filter(matchesFilters).sort((a,b)=> a.done-b.done || a.subject.localeCompare(b.subject));
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31
     tasks.forEach(t=>{
       const item=ce('div','card'+(t.done?' done':'')); item.draggable=true; item.dataset.id=t.id;
       item.innerHTML=`
@@ -326,22 +220,14 @@ function renderWeek(){
         </div>`;
       item.querySelector('.icon-btn').onclick=()=>openForm('edit',t);
 
-<<<<<<< HEAD
       item.addEventListener('dragstart',(e)=>{ item.classList.add('dragging'); try{ e.dataTransfer.setData('text/plain',t.id); }catch{} });
-=======
-      item.addEventListener('dragstart',(e)=>{ item.classList.add('dragging'); e.dataTransfer.setData('text/plain',t.id); });
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31
       item.addEventListener('dragend',()=> item.classList.remove('dragging'));
       col.appendChild(item);
     });
 
     col.addEventListener('dragover',(e)=>{ e.preventDefault(); col.classList.add('drop-target'); });
     col.addEventListener('dragleave',()=> col.classList.remove('drop-target'));
-<<<<<<< HEAD
     col.addEventListener('drop',(e)=>{ e.preventDefault(); col.classList.remove('drop-target'); let id=''; try{ id=e.dataTransfer.getData('text/plain'); }catch{} if(!id) return; updateTask(id,{plannedDate:iso}); save(); renderAll(); });
-=======
-    col.addEventListener('drop',(e)=>{ e.preventDefault(); col.classList.remove('drop-target'); const id=e.dataTransfer.getData('text/plain'); if(!id) return; updateTask(id,{plannedDate:iso}); save(); renderAll(); });
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31
 
     weekGridEl.appendChild(col);
   });
@@ -375,7 +261,6 @@ function renderAll(){
   toggleViewBtn.setAttribute('aria-pressed', state.view==='week');
 }
 
-<<<<<<< HEAD
 // ICON BTN
 function iconButton(char,label,onClick){ const b=ce('button','icon-btn'); b.title=label; b.setAttribute('aria-label',label); b.textContent=char; b.onclick=onClick; return b; }
 
@@ -502,148 +387,12 @@ function wireEvents(){
     });
   });
 }
-=======
-// UI HELPERS
-function iconButton(char,label,onClick){ const b=ce('button','icon-btn'); b.title=label; b.setAttribute('aria-label',label); b.textContent=char; b.onclick=onClick; return b; }
-function minutesToText(min){ const h=Math.floor(min/60), m=min%60; if(h===0) return `${m} min`; if(m===0) return `${h} u`; return `${h} u ${m} min`; }
-function fmtShort(d){ return d.toLocaleDateString('nl-NL',{day:'2-digit',month:'2-digit'}); }
-function ucfirst(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
-function escapeHTML(s){ return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function qs(s){ return document.querySelector(s); }
-function ce(tag, cls){ const el=document.createElement(tag); if(cls) el.className=cls; return el; }
-
-// EVENTS
-prevWeekBtn.onclick=()=>{ state.weekStart=addDays(state.weekStart,-7); save(); renderAll(); };
-thisWeekBtn.onclick=()=>{ state.weekStart=startOfWeek(new Date()); save(); renderAll(); };
-nextWeekBtn.onclick=()=>{ state.weekStart=addDays(state.weekStart,7); save(); renderAll(); };
-
-toggleViewBtn.onclick=()=>{ state.view = state.view==='day' ? 'week':'day'; save(); renderAll(); };
-
-quickAddBtn.onclick=()=>{
-  const d=fmtISO(activeDate());
-  q_title.value=''; q_subject.value=SUBJECTS[0]; q_minutes.value=15; q_date.value=d; q_type.value='Huiswerk';
-  openQuick(true);
-};
-quickCancel.onclick=()=> openQuick(false);
-quickForm.onsubmit=(e)=>{
-  e.preventDefault();
-  const t={ id:'', title:q_title.value.trim(), subject:q_subject.value, type:q_type.value,
-    estimate:Number(q_minutes.value)||0, plannedDate:q_date.value, dueDate:'', notes:'', done:false };
-  if(!t.title) return;
-  addTask(t); save(); openQuick(false); renderAll();
-};
-
-subjectFilter.onchange=()=>{ state.filters.subject=subjectFilter.value; save(); renderAll(); };
-showDoneToggle.onchange=()=>{ state.filters.showDone=showDoneToggle.checked; save(); renderAll(); };
-searchInput.oninput=()=>{ state.filters.search=searchInput.value; renderAll(); };
-
-clearDoneBtn.onclick=()=>{
-  const dates=thisWeekDates().map(fmtISO);
-  const before=state.tasks.length;
-  state.tasks = state.tasks.filter(t=> !(t.done && dates.includes(t.plannedDate)));
-  if(before!==state.tasks.length){ save(); renderAll(); }
-};
-clearDoneBtn.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); clearDoneBtn.click(); } });
-
-chevLeft.onclick=()=>{ if(state.activeTab>0){ state.activeTab--; save(); renderAll(); } };
-chevRight.onclick=()=>{ if(state.activeTab<6){ state.activeTab++; save(); renderAll(); } };
-
-window.addEventListener('keydown',e=>{
-  if(e.key==='ArrowLeft'){ if(state.activeTab>0){ state.activeTab--; save(); renderAll(); } }
-  if(e.key==='ArrowRight'){ if(state.activeTab<6){ state.activeTab++; save(); renderAll(); } }
-});
-
-// Swipe
-let touchStartX=null;
-document.addEventListener('touchstart',e=>{ if(e.touches.length===1){ touchStartX=e.touches[0].clientX; } },{passive:true});
-document.addEventListener('touchend',e=>{
-  if(touchStartX==null) return;
-  const dx=e.changedTouches[0].clientX - touchStartX;
-  if(Math.abs(dx)>60){ if(dx<0 && state.activeTab<6) state.activeTab++; if(dx>0 && state.activeTab>0) state.activeTab--; save(); renderAll(); }
-  touchStartX=null;
-});
-
-// Modals open/close
-newTaskBtn.onclick=()=> openForm('new');
-cancelFormBtn.onclick=()=> closeForm();
-taskModal.addEventListener('click',e=>{ if(e.target===taskModal) closeForm(); });
-
-taskForm.onsubmit=(e)=>{
-  e.preventDefault();
-  const v={
-    title:f_title.value.trim(), subject:f_subject.value, type:f_type.value,
-    estimate:Number(f_estimate.value)||0, plannedDate:f_plannedDate.value,
-    dueDate:f_dueDate.value||'', notes:f_notes.value.trim(),
-    split:f_split.checked, splitMinutes:Number(f_splitMinutes.value)||25,
-    skipWeekend:f_skipWeekend.checked, repeat:f_repeat.checked,
-    repeatMinutes:Number(f_repeatMinutes.value)||10, repeatPattern:f_repeatPattern.value.trim()
-  };
-  const err=validateSplitAndRepeat(v);
-  if(err){ formError.textContent=err; formError.style.display='block'; return; }
-  formError.style.display='none';
-
-  if(state.editingId){
-    if(v.split && v.dueDate){
-      deleteTask(state.editingId);
-      const set=planSplitTasks({ title:v.title, subject:v.subject, type:v.type, splitMinutes:v.splitMinutes, skipWeekend:v.skipWeekend, plannedDate:v.plannedDate, dueDate:v.dueDate, notes:v.notes });
-      set.forEach(t=>state.tasks.push(t));
-      if(v.repeat && v.repeatPattern){
-        set.forEach(slice=>{
-          const reps=planRepetitions(slice.plannedDate, v.repeatPattern, v.repeatMinutes, slice.subject, slice.title.replace(/\s\(\d+\/\d+\)$/,''), v.dueDate, v.notes);
-          reps.forEach(r=>state.tasks.push(r));
-        });
-      }
-    }else{
-      updateTask(state.editingId,{ title:v.title, subject:v.subject, type:v.type, estimate:v.estimate, plannedDate:v.plannedDate, dueDate:v.dueDate, notes:v.notes });
-      if(v.repeat && v.repeatPattern){
-        const reps=planRepetitions(v.plannedDate, v.repeatPattern, v.repeatMinutes, v.subject, v.title, v.dueDate, v.notes);
-        reps.forEach(r=>state.tasks.push(r));
-      }
-    }
-  }else{
-    if(v.split && v.dueDate){
-      const set=planSplitTasks({ title:v.title, subject:v.subject, type:v.type, splitMinutes:v.splitMinutes, skipWeekend:v.skipWeekend, plannedDate:v.plannedDate, dueDate:v.dueDate, notes:v.notes });
-      set.forEach(t=>state.tasks.push(t));
-      if(v.repeat && v.repeatPattern){
-        set.forEach(slice=>{
-          const reps=planRepetitions(slice.plannedDate, v.repeatPattern, v.repeatMinutes, slice.subject, slice.title.replace(/\s\(\d+\/\d+\)$/,''), v.dueDate, v.notes);
-          reps.forEach(r=>state.tasks.push(r));
-        });
-      }
-    }else{
-      state.tasks.push({ id:crypto.randomUUID(), title:v.title, subject:v.subject, type:v.type, estimate:v.estimate, plannedDate:v.plannedDate, dueDate:v.dueDate, notes:v.notes, done:false });
-      if(v.repeat && v.repeatPattern){
-        const reps=planRepetitions(v.plannedDate, v.repeatPattern, v.repeatMinutes, v.subject, v.title, v.dueDate, v.notes);
-        reps.forEach(r=>state.tasks.push(r));
-      }
-    }
-  }
-
-  save(); closeForm(); renderAll();
-});
-
-// Focus-trap
-['taskModal','quickModal'].forEach(id=>{
-  const m=document.getElementById(id);
-  m.addEventListener('keydown',(e)=>{
-    if(e.key!=='Tab' || !m.classList.contains('open')) return;
-    const f=m.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
-    if(!f.length) return; const first=f[0], last=f[f.length-1];
-    if(e.shiftKey && document.activeElement===first){ last.focus(); e.preventDefault(); }
-    else if(!e.shiftKey && document.activeElement===last){ first.focus(); e.preventDefault(); }
-  });
-});
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31
 
 // OPEN/CLOSE HELPERS
 function openForm(mode, task=null){
   taskModal.classList.add('open');
   document.body.style.overflow='hidden';
-<<<<<<< HEAD
   const app = document.getElementById('app'); if(app) app.style.filter='blur(1px)';
-=======
-  document.getElementById('app').style.filter='blur(1px)';
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31
   formError.style.display='none';
 
   if(mode==='edit' && task){
@@ -662,25 +411,16 @@ function openForm(mode, task=null){
 function closeForm(){
   taskModal.classList.remove('open');
   document.body.style.overflow='';
-<<<<<<< HEAD
   const app = document.getElementById('app'); if(app) app.style.filter='';
-=======
-  document.getElementById('app').style.filter='';
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31
 }
 function openQuick(flag){
   quickModal.classList.toggle('open', !!flag);
   document.body.style.overflow = flag ? 'hidden':'';
-<<<<<<< HEAD
   const app = document.getElementById('app'); if(app) app.style.filter = flag ? 'blur(1px)' : '';
-=======
-  document.getElementById('app').style.filter = flag ? 'blur(1px)' : '';
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31
 }
 
 // INIT
 function init(){
-<<<<<<< HEAD
   // refs
   tablistEl = qs('#tablist'); taskListEl = qs('#taskList'); dayTitleEl = qs('#dayTitle'); dayTotalEl = qs('#dayTotal'); statsListEl = qs('#statsList'); weekGridEl = qs('#weekGrid');
   prevWeekBtn = qs('#prevWeekBtn'); thisWeekBtn = qs('#thisWeekBtn'); nextWeekBtn = qs('#nextWeekBtn'); newTaskBtn = qs('#newTaskBtn'); toggleViewBtn = qs('#toggleViewBtn'); quickAddBtn = qs('#quickAddBtn');
@@ -698,12 +438,3 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
-=======
-  load(); renderFiltersInit();
-  subjectFilter.value = state.filters.subject || 'Alle';
-  showDoneToggle.checked = !!state.filters.showDone;
-  searchInput.value = state.filters.search || '';
-  renderAll();
-}
-init();
->>>>>>> b5cc61a6a5f252f94635cc5a60e320714aedee31

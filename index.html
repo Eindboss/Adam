@@ -6,6 +6,7 @@
   <title>Adam’s Leeragenda</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link href="./styles.css" rel="stylesheet">
+  <script src="./theme.js" defer></script>
 </head>
 <body data-theme="dark">
   <div class="app" id="app" aria-live="polite">
@@ -13,7 +14,7 @@
     <header class="header" role="banner">
       <div class="title-row">
         <h1>Adam’s Leeragenda</h1>
-        <button id="themeToggle" class="btn" title="Thema wisselen (hook aanwezig)" aria-label="Thema wisselen" style="display:none">Thema</button>
+        <button id="themeToggle" class="btn" title="Wissel tussen donker/licht thema" aria-label="Wissel thema">🌗 Thema</button>
       </div>
 
       <div class="chips" aria-hidden="true">
@@ -155,6 +156,6 @@
     </div>
   </div>
 
-  <script src="./app.js"></script>
+  <script src="./app.js" defer></script>
 </body>
 </html>
