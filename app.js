@@ -5,30 +5,25 @@ const SUBJECT_COLORS = {
   'Aardrijkskunde':'#06B6D4','Geschiedenis':'#D97706','Nederlands':'#A7F3D0',
   'Latijn':'#06B6D4','Wiskunde':'#D97706','Frans':'#A7F3D0','Engels':'#06B6D4','Biologie':'#D97706'
 };
-const TYPES = ['Huiswerk','Leerwerk','Project','Overig','Herhaling'];
 const DAYS = ['Ma','Di','Wo','Do','Vr','Za','Zo'];
 
-// ---- SAFE UTILITIES / POLYFILLS ----
-const uid = (() => {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return () => crypto.randomUUID();
-  }
-  return () => 'u-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+// UTILITIES
+const uid = (()=>{
+  if (typeof crypto!=='undefined' && crypto.randomUUID) return ()=>crypto.randomUUID();
+  return ()=> 'u-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
 })();
-
-function qs(s){ return document.querySelector(s); }
+const qs = (s)=>document.querySelector(s);
 function ce(tag, cls){ const el=document.createElement(tag); if(cls) el.className=cls; return el; }
-function escapeHTML(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function ucfirst(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+function ucfirst(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
 function minutesToText(min){ const h=Math.floor(min/60), m=min%60; if(h===0) return `${m} min`; if(m===0) return `${h} u`; return `${h} u ${m} min`; }
 
-// DATE HELPERS
-function startOfWeek(d){ const date=new Date(d); const day=(date.getDay()+6)%7; date.setDate(date.getDate()-day); date.setHours(0,0,0,0); return date; }
+// DATES
+function startOfWeek(d){ const x=new Date(d); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); x.setHours(0,0,0,0); return x; }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
 function fmtISO(d){ return d.toISOString().slice(0,10); }
 function parseISO(s){ const [y,m,dd]=(s||'').split('-').map(Number); const d=new Date(y||NaN,(m||1)-1,dd||1); d.setHours(0,0,0,0); return d; }
-function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
-function isWeekend(d){ const day=(d.getDay()+6)%7; return day>=5; }
 function fmtShort(d){ return d.toLocaleDateString('nl-NL',{day:'2-digit',month:'2-digit'}); }
+function isWeekend(d){ const day=(d.getDay()+6)%7; return day>=5; }
 
 // STATE
 const state = {
@@ -40,21 +35,12 @@ const state = {
   editingId: null
 };
 
-// UI REFS
-let tablistEl, taskListEl, dayTitleEl, dayTotalEl, statsListEl, weekGridEl;
-let prevWeekBtn, thisWeekBtn, nextWeekBtn, newTaskBtn, toggleViewBtn, quickAddBtn;
-let subjectFilter, searchInput, showDoneToggle, clearDoneBtn;
-let chevLeft, chevRight, dayView, weekView;
-let taskModal, taskForm, formError, cancelFormBtn, taskModalTitle, submitFormBtn;
-let f_title, f_subject, f_type, f_estimate, f_plannedDate, f_dueDate, f_notes, f_split, f_splitMinutes, f_skipWeekend, f_repeat, f_repeatMinutes, f_repeatPattern;
-let quickModal, q_title, q_subject, q_minutes, q_date, q_type, quickForm, quickCancel;
-
 // STORAGE
 function load(){
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if(!raw) return;
   try{
-    const obj=JSON.parse(raw);
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    const obj = JSON.parse(raw);
     state.tasks = Array.isArray(obj.tasks) ? obj.tasks : [];
     state.weekStart = obj.weekStart ? parseISO(obj.weekStart) : startOfWeek(new Date());
     state.activeTab = Number.isInteger(obj.activeTab) ? obj.activeTab : 0;
@@ -76,19 +62,18 @@ function save(){
   }catch(e){}
 }
 
+// HELPERS
 function thisWeekDates(){ return Array.from({length:7},(_,i)=>addDays(state.weekStart,i)); }
 function activeDate(){ return addDays(state.weekStart, state.activeTab); }
-
 function matchesFilters(task){
   if(state.filters.subject!=='Alle' && task.subject!==state.filters.subject) return false;
   if(!state.filters.showDone && task.done) return false;
   if(state.filters.search){
-    const q = state.filters.search.toLowerCase();
+    const q=state.filters.search.toLowerCase();
     if(!task.title.toLowerCase().includes(q)) return false;
   }
   return true;
 }
-
 function buildWeeklyStats(){
   const dates=thisWeekDates().map(fmtISO);
   const per={}; SUBJECTS.forEach(s=> per[s]={done:0,total:0});
@@ -101,13 +86,13 @@ function buildWeeklyStats(){
 }
 
 // CRUD
-function addTask(t){ t.id = uid(); state.tasks.push(t); }
+function addTask(t){ t.id=uid(); state.tasks.push(t); }
 function updateTask(id,patch){ const i=state.tasks.findIndex(x=>x.id===id); if(i>-1) state.tasks[i]={...state.tasks[i],...patch}; }
-function deleteTask(id){ state.tasks = state.tasks.filter(x=>x.id!==id); }
+function deleteTask(id){ state.tasks=state.tasks.filter(x=>x.id!==id); }
 function copyTask(id){ const t=state.tasks.find(x=>x.id===id); if(!t) return; state.tasks.push({...t,id:uid(),title:t.title+' (kopie)'}); }
 function moveTaskToTomorrow(id){ const t=state.tasks.find(x=>x.id===id); if(!t) return; updateTask(id,{plannedDate: fmtISO(addDays(parseISO(t.plannedDate),1))}); }
 
-// SPLIT & REPEAT
+// SPLIT / REPEAT
 function validateSplitAndRepeat(v){
   if(v.split){
     if(!v.dueDate) return 'Bij verdelen is een deadline verplicht.';
@@ -138,34 +123,24 @@ function planRepetitions(baseISO, patternStr, repeatMinutes, subject, title, due
 }
 
 // RENDER
+let tablistEl, taskListEl, dayTitleEl, dayTotalEl, statsListEl, weekGridEl;
+let prevWeekBtn, thisWeekBtn, nextWeekBtn, newTaskBtn, toggleViewBtn, quickAddBtn;
+let subjectFilter, searchInput, showDoneToggle, clearDoneBtn;
+let chevLeft, chevRight, dayView, weekView;
+let taskModal, taskForm, formError, cancelFormBtn, taskModalTitle, submitFormBtn;
+let f_title, f_subject, f_type, f_estimate, f_plannedDate, f_dueDate, f_notes, f_split, f_splitMinutes, f_skipWeekend, f_repeat, f_repeatMinutes, f_repeatPattern;
+let quickModal, q_title, q_subject, q_minutes, q_date, q_type, quickForm, quickCancel;
+
 function renderTabs(){
   tablistEl.innerHTML='';
   thisWeekDates().forEach((d,i)=>{
     const b=ce('button','tab');
-    b.setAttribute('role','tab'); b.setAttribute('aria-selected', i===state.activeTab? 'true':'false');
-    b.textContent=DAYS[i]; b.onclick=()=>{ state.activeTab=i; save(); renderAll(); };
+    b.setAttribute('role','tab');
+    b.setAttribute('aria-selected', i===state.activeTab? 'true':'false');
+    b.textContent=DAYS[i];
+    b.onclick=()=>{ state.activeTab=i; save(); renderAll(); };
     tablistEl.appendChild(b);
   });
-}
-function renderDay(){
-  const date=activeDate(); const iso=fmtISO(date);
-  const dayName=date.toLocaleDateString('nl-NL',{weekday:'long'});
-  const dayNum=String(date.getDate()).padStart(2,'0');
-  const month=date.toLocaleDateString('nl-NL',{month:'short'});
-  dayTitleEl.textContent=`${ucfirst(dayName)} ${dayNum} ${month}`;
-
-  const todays=state.tasks.filter(t=>t.plannedDate===iso).filter(matchesFilters)
-    .sort((a,b)=> a.done-b.done || a.subject.localeCompare(b.subject));
-
-  const total=todays.reduce((s,t)=> s + (t.done?0:Number(t.estimate||0)),0);
-  dayTotalEl.textContent= total>0 ? `Totaal: ${minutesToText(total)}` : 'Totaal: 0 min';
-
-  taskListEl.innerHTML='';
-  if(!todays.length){
-    const empty=ce('div','card'); empty.innerHTML=`<div class="form-help">Geen taken voor deze dag. Tip: gebruik “Nieuwe taak” of “Snel toevoegen”.</div>`;
-    taskListEl.appendChild(empty); return;
-  }
-  todays.forEach(t=> taskListEl.appendChild(taskCard(t)));
 }
 function taskCard(t){
   const card=ce('div','card'+(t.done?' done':'')); card.dataset.id=t.id;
@@ -183,21 +158,35 @@ function taskCard(t){
   const mid=ce('div');
   const ti=ce('div','title'); ti.textContent=t.title;
   const meta=ce('div','meta');
-  const s1=ce('span'); s1.textContent=t.type;
-  const s2=ce('span'); s2.textContent=`${t.estimate} min`;
-  const s3=ce('span'); s3.textContent = t.dueDate? `deadline ${fmtShort(parseISO(t.dueDate))}` : 'geen deadline';
-  meta.append(s1,s2,s3); mid.append(ti,meta);
+  meta.textContent = `${t.type} · ${t.estimate} min` + (t.dueDate? ` · deadline ${fmtShort(parseISO(t.dueDate))}` : '');
+  mid.append(ti,meta);
   if(t.notes){ const n=ce('div','form-help'); n.style.marginTop='6px'; n.textContent=t.notes; mid.append(n); }
 
   const act=ce('div','actions');
-  act.append(
-    iconButton('🗓','Naar morgen',()=>{ moveTaskToTomorrow(t.id); save(); renderAll(); }),
-    iconButton('📄','Kopieer',()=>{ copyTask(t.id); save(); renderAll(); }),
-    iconButton('✏️','Bewerk',()=>{ openForm('edit',t); }),
-    iconButton('🗑','Verwijder',()=>{ if(confirm('Taak verwijderen?')){ deleteTask(t.id); save(); renderAll(); }})
-  );
+  const btnTomorrow = ce('button','icon-btn'); btnTomorrow.title='Naar morgen'; btnTomorrow.setAttribute('aria-label','Naar morgen'); btnTomorrow.textContent='🗓'; btnTomorrow.onclick=()=>{ moveTaskToTomorrow(t.id); save(); renderAll(); };
+  const btnCopy = ce('button','icon-btn'); btnCopy.title='Kopieer'; btnCopy.setAttribute('aria-label','Kopieer'); btnCopy.textContent='📄'; btnCopy.onclick=()=>{ copyTask(t.id); save(); renderAll(); };
+  const btnEdit = ce('button','icon-btn'); btnEdit.title='Bewerk'; btnEdit.setAttribute('aria-label','Bewerk'); btnEdit.textContent='✏️'; btnEdit.onclick=()=> openForm('edit',t);
+  const btnDel = ce('button','icon-btn'); btnDel.title='Verwijder'; btnDel.setAttribute('aria-label','Verwijder'); btnDel.textContent='🗑'; btnDel.onclick=()=>{ if(confirm('Taak verwijderen?')){ deleteTask(t.id); save(); renderAll(); } };
+  act.append(btnTomorrow,btnCopy,btnEdit,btnDel);
 
   row.append(left,mid,act); card.appendChild(row); return card;
+}
+function renderDay(){
+  const date=activeDate(); const iso=fmtISO(date);
+  dayTitleEl.textContent = `${ucfirst(date.toLocaleDateString('nl-NL',{weekday:'long'}))} ${String(date.getDate()).padStart(2,'0')} ${date.toLocaleDateString('nl-NL',{month:'short'})}`;
+
+  const todays=state.tasks.filter(t=>t.plannedDate===iso).filter(matchesFilters)
+    .sort((a,b)=> a.done-b.done || a.subject.localeCompare(b.subject));
+
+  const total=todays.reduce((s,t)=> s + (t.done?0:Number(t.estimate||0)),0);
+  dayTotalEl.textContent= total>0 ? `Totaal: ${minutesToText(total)}` : 'Totaal: 0 min';
+
+  taskListEl.innerHTML='';
+  if(!todays.length){
+    const empty=ce('div','card'); empty.innerHTML=`<div class="form-help">Geen taken voor deze dag. Tip: gebruik “Nieuwe taak” of “Snel toevoegen”.</div>`;
+    taskListEl.appendChild(empty); return;
+  }
+  todays.forEach(t=> taskListEl.appendChild(taskCard(t)));
 }
 function renderWeek(){
   weekGridEl.innerHTML='';
@@ -214,20 +203,20 @@ function renderWeek(){
       const item=ce('div','card'+(t.done?' done':'')); item.draggable=true; item.dataset.id=t.id;
       item.innerHTML=`
         <div class="task-row">
-          <div class="task-left"><span class="pill" style="border-color:${SUBJECT_COLORS[t.subject]||'#06B6D4'}">${escapeHTML(t.subject)}</span></div>
-          <div><div class="title">${escapeHTML(t.title)}</div><div class="meta">${t.type} · ${t.estimate} min</div></div>
+          <div class="task-left"><span class="pill" style="border-color:${SUBJECT_COLORS[t.subject]||'#06B6D4'}">${t.subject}</span></div>
+          <div><div class="title">${t.title}</div><div class="meta">${t.type} · ${t.estimate} min</div></div>
           <div class="actions"><button class="icon-btn" title="Bewerk" aria-label="Bewerk">✏️</button></div>
         </div>`;
       item.querySelector('.icon-btn').onclick=()=>openForm('edit',t);
 
-      item.addEventListener('dragstart',(e)=>{ item.classList.add('dragging'); try{ e.dataTransfer.setData('text/plain',t.id); }catch{} });
+      item.addEventListener('dragstart',(e)=>{ item.classList.add('dragging'); try{ e.dataTransfer.setData('text/plain',t.id); }catch(_e){} });
       item.addEventListener('dragend',()=> item.classList.remove('dragging'));
+      col.addEventListener('dragover',(e)=>{ e.preventDefault(); col.classList.add('drop-target'); });
+      col.addEventListener('dragleave',()=> col.classList.remove('drop-target'));
+      col.addEventListener('drop',(e)=>{ e.preventDefault(); col.classList.remove('drop-target'); let id=''; try{ id=e.dataTransfer.getData('text/plain'); }catch(_e){} if(!id) return; updateTask(id,{plannedDate:iso}); save(); renderAll(); });
+
       col.appendChild(item);
     });
-
-    col.addEventListener('dragover',(e)=>{ e.preventDefault(); col.classList.add('drop-target'); });
-    col.addEventListener('dragleave',()=> col.classList.remove('drop-target'));
-    col.addEventListener('drop',(e)=>{ e.preventDefault(); col.classList.remove('drop-target'); let id=''; try{ id=e.dataTransfer.getData('text/plain'); }catch{} if(!id) return; updateTask(id,{plannedDate:iso}); save(); renderAll(); });
 
     weekGridEl.appendChild(col);
   });
@@ -238,7 +227,8 @@ function renderStats(){
   SUBJECTS.forEach(s=>{
     const row=ce('div','stat-row');
     const label=ce('div'); label.style.minWidth='120px'; label.textContent=s;
-    const bar=ce('div','bar'); const fill=ce('span'); const total=per[s].total||0; const done=per[s].done||0; const pct= total? Math.round(done/total*100):0;
+    const bar=ce('div','bar'); const fill=ce('span');
+    const total=per[s].total||0; const done=per[s].done||0; const pct= total? Math.round(done/total*100):0;
     fill.style.width=pct+'%'; fill.style.background=SUBJECT_COLORS[s]||'#06B6D4'; bar.appendChild(fill);
     const txt=ce('div'); txt.style.minWidth='70px'; txt.style.textAlign='right'; txt.textContent=`${done}/${total}`;
     row.append(label,bar,txt); statsListEl.appendChild(row);
@@ -260,9 +250,6 @@ function renderAll(){
   toggleViewBtn.textContent = state.view==='day' ? 'Weekoverzicht':'Dagweergave';
   toggleViewBtn.setAttribute('aria-pressed', state.view==='week');
 }
-
-// ICON BTN
-function iconButton(char,label,onClick){ const b=ce('button','icon-btn'); b.title=label; b.setAttribute('aria-label',label); b.textContent=char; b.onclick=onClick; return b; }
 
 // EVENTS
 function wireEvents(){
@@ -375,20 +362,21 @@ function wireEvents(){
     save(); closeForm(); renderAll();
   });
 
-  // Focus-trap
+  // Focus trap binnen modals
   ['taskModal','quickModal'].forEach(id=>{
     const m=document.getElementById(id);
     m.addEventListener('keydown',(e)=>{
       if(e.key!=='Tab' || !m.classList.contains('open')) return;
-      const f=m.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
-      if(!f.length) return; const first=f[0], last=f[f.length-1];
+      const focusables = m.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+      if(!focusables.length) return;
+      const first=focusables[0], last=focusables[focusables.length-1];
       if(e.shiftKey && document.activeElement===first){ last.focus(); e.preventDefault(); }
       else if(!e.shiftKey && document.activeElement===last){ first.focus(); e.preventDefault(); }
     });
   });
 }
 
-// OPEN/CLOSE HELPERS
+// MODALS OPEN/CLOSE
 function openForm(mode, task=null){
   taskModal.classList.add('open');
   document.body.style.overflow='hidden';
@@ -415,13 +403,12 @@ function closeForm(){
 }
 function openQuick(flag){
   quickModal.classList.toggle('open', !!flag);
-  document.body.style.overflow = flag ? 'hidden':'';
+  document.body.style.overflow = flag ? 'hidden' : '';
   const app = document.getElementById('app'); if(app) app.style.filter = flag ? 'blur(1px)' : '';
 }
 
 // INIT
 function init(){
-  // refs
   tablistEl = qs('#tablist'); taskListEl = qs('#taskList'); dayTitleEl = qs('#dayTitle'); dayTotalEl = qs('#dayTotal'); statsListEl = qs('#statsList'); weekGridEl = qs('#weekGrid');
   prevWeekBtn = qs('#prevWeekBtn'); thisWeekBtn = qs('#thisWeekBtn'); nextWeekBtn = qs('#nextWeekBtn'); newTaskBtn = qs('#newTaskBtn'); toggleViewBtn = qs('#toggleViewBtn'); quickAddBtn = qs('#quickAddBtn');
   subjectFilter = qs('#subjectFilter'); searchInput = qs('#searchInput'); showDoneToggle = qs('#showDoneToggle'); clearDoneBtn = qs('#clearDoneBtn');
@@ -431,13 +418,8 @@ function init(){
   quickModal = qs('#quickModal'); q_title = qs('#q_title'); q_subject = qs('#q_subject'); q_minutes = qs('#q_minutes'); q_date = qs('#q_date'); q_type = qs('#q_type'); quickForm = qs('#quickForm'); quickCancel = qs('#quickCancel');
 
   load(); renderFiltersInit(); renderAll(); wireEvents();
+  window.__APP_READY = true;
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init, { once:true });
-} else {
-  init();
-}
-
-// Ready marker for bootloader
-window.__APP_READY = true;
+if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init, {once:true}); }
+else{ init(); }
