@@ -1,37 +1,71 @@
-// THEME HANDLER (light/dark) — saved separately so je alleen dit bestand kunt vervangen
+// THEME HANDLER (light/dark)
 (function(){
-  const THEME_KEY = 'adam-theme';
-  const btn = document.getElementById('themeToggle');
+  const KEY_PRIMARY   = 'theme';        // nieuwe sleutel
+  const KEY_LEGACY    = 'adam-theme';   // oude sleutel (migratie)
+  const root = document.documentElement; // <html>
+  const btn  = document.getElementById('themeToggle');
 
-  function systemPrefersDark(){
+  function prefersDark(){
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   }
-  function getSavedTheme(){
-    try{ return localStorage.getItem(THEME_KEY); }catch(e){ return null; }
-  }
-  function saveTheme(t){
-    try{ localStorage.setItem(THEME_KEY, t); }catch(e){}
-  }
-  function applyTheme(t){
-    document.body.setAttribute('data-theme', t);
-    if(btn){ btn.textContent = t==='dark' ? '🌗 Licht thema' : '🌑 Donker thema'; btn.setAttribute('aria-label', 'Wissel naar ' + (t==='dark'?'licht':'donker')); }
+
+  function readStored(){
+    try{
+      // eerst nieuwe sleutel
+      let v = localStorage.getItem(KEY_PRIMARY);
+      // migratiepad vanaf oude sleutel
+      if(!v){
+        const legacy = localStorage.getItem(KEY_LEGACY);
+        if(legacy){
+          localStorage.setItem(KEY_PRIMARY, legacy);
+          localStorage.removeItem(KEY_LEGACY);
+          v = legacy;
+        }
+      }
+      return v;
+    }catch(_){ return null; }
   }
 
-  function init(){
-    const saved = getSavedTheme();
-    const theme = saved || (systemPrefersDark()? 'dark':'light');
-    applyTheme(theme);
+  function store(val){
+    try{ localStorage.setItem(KEY_PRIMARY, val); }catch(_){}
+  }
 
+  function apply(val){
+    root.setAttribute('data-theme', val);
     if(btn){
+      btn.textContent = (val === 'dark') ? '🌗 Licht thema' : '🌑 Donker thema';
+      btn.setAttribute('aria-label', 'Wissel naar ' + (val==='dark' ? 'licht' : 'donker'));
       btn.style.display = 'inline-flex';
-      btn.addEventListener('click',()=>{
-        const current = document.body.getAttribute('data-theme') || 'dark';
-        const next = current==='dark' ? 'light' : 'dark';
-        applyTheme(next); saveTheme(next);
-      });
     }
   }
 
-  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init, {once:true}); }
-  else{ init(); }
+  function current(){
+    return root.getAttribute('data-theme');
+  }
+
+  function init(){
+    // volgorde van voorkeuren:
+    // 1) expliciet op <html data-theme="...">
+    // 2) opgeslagen in storage (nieuwe of legacy key)
+    // 3) systeemvoorkeur
+    // 4) default: 'light'
+    const fromDom = current();
+    const fromStore = readStored();
+    const start = fromDom || fromStore || (prefersDark() ? 'dark' : 'light');
+    apply(start);
+
+    if(btn){
+      btn.addEventListener('click', function(){
+        const next = (current() === 'dark') ? 'light' : 'dark';
+        apply(next);
+        store(next);
+      }, {passive: true});
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init, {once: true});
+  }else{
+    init();
+  }
 })();
