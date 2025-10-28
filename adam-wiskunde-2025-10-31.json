@@ -1,0 +1,35 @@
+[
+  {
+    "id": "6e350832-55d7-438f-ba73-5eb9e90d0f53",
+    "title": "WIS: hoofdstuk 3 (1/3)",
+    "subject": "Wiskunde",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-28",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "8f7bead2-af7a-44a1-97e7-7f2acce9a392",
+    "title": "WIS: hoofdstuk 3 (2/3)",
+    "subject": "Wiskunde",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-29",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  },
+  {
+    "id": "f83060d9-d480-43be-bd47-35800710f77c",
+    "title": "WIS: hoofdstuk 3 (3/3)",
+    "subject": "Wiskunde",
+    "type": "Leerwerk",
+    "estimate": 30,
+    "plannedDate": "2025-10-30",
+    "dueDate": "2025-10-31",
+    "notes": "",
+    "done": false
+  }
+]
