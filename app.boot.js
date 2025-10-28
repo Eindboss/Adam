@@ -24,14 +24,20 @@
 
   function loadScript(src){ return new Promise((resolve,reject)=>{ const s=document.createElement('script'); s.src=src; s.defer=true; s.onload=resolve; s.onerror=()=>reject(new Error('Kon '+src+' niet laden')); document.head.appendChild(s); }); }
 
-  async function boot(){
-    try{
-      show('App start…');
-      await loadScript('./app.core.js');
-      await loadScript('./app.ui.js');
-      setTimeout(()=>{
-        if(window.__APP_READY){ show('App gereed'); }
-        else { show('App script geladen maar niet gestart', 'err'); }
+  
+async function boot(){
+  try{
+    show('App start…');
+    // Scripts worden via index.html geladen (defer)
+    setTimeout(()=>{
+      if(window.__APP_READY){ show('App gereed'); }
+      else { show('App script geladen maar niet gestart', 'err'); }
+    }, 300);
+  }catch(err){
+    show(err && err.message ? err.message : 'Boot error', 'err');
+  }
+}
+else { show('App script geladen maar niet gestart', 'err'); }
       }, 300);
     }catch(err){
       show(err.message || 'Boot error', 'err');
